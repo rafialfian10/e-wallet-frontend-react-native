@@ -1,20 +1,28 @@
-
 import { useContext } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { StyleSheet, View, Modal, Alert, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Modal,
+  Alert,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 
 import { UserContext } from "../Context/UserContext";
 import { API } from "../Config/Api";
 
-function ModalPhoto({
-  refetchUser,
-  setForm,
-  modalPhotoProfile,
-  setModalPhotoProfile,
-  setModalProfile,
-  setNewURLPhoto,
-}) {
+function ModalPhoto(props) {
+  const {
+    refetchUser,
+    setForm,
+    modalPhotoProfile,
+    setModalPhotoProfile,
+    setModalProfile,
+    setNewURLPhoto,
+  } = props;
+
   const [state, dispatch] = useContext(UserContext);
 
   const handleOpenGallery = async () => {
@@ -73,12 +81,14 @@ function ModalPhoto({
         type: "image/jpeg",
         name: `${state?.user?.username}.jpg`,
       });
+      console.log("body form", formData._parts);
 
       const response = await API.patch(
         `/user/${state?.user?.id}`,
         formData,
         config
       );
+
       if (response?.data?.status === 200) {
         alert("Photo has been successfully updated");
         refetchUser();
@@ -95,6 +105,7 @@ function ModalPhoto({
       }
     } catch (error) {
       console.log("photo failed to upload", error);
+      alert("Failed to update photo. Please check your network connection.");
     }
   };
 
@@ -118,13 +129,16 @@ function ModalPhoto({
           {
             text: "OK",
             onPress: async () => {
-              const response = await API.delete(`/user/${state?.user?.id}/photo`, config);
+              const response = await API.delete(
+                `/user/${state?.user?.id}/photo`,
+                config
+              );
 
               if (response?.status === 200) {
                 alert("Photo has been deleted");
                 refetchUser();
                 setModalProfile(false);
-                setNewURLPhoto()
+                setNewURLPhoto();
               }
             },
           },

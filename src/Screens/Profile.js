@@ -14,8 +14,10 @@ import {
 
 import ModalProfile from "../Components/modalProfile";
 import ModalPhoto from "../Components/modalPhoto";
-import { PATH_FILE } from "@env";
 import { GetUser } from "../Components/Common/Hooks/getUser";
+import { PATH_FILE } from "@env";
+
+console.log(PATH_FILE);
 
 const Profile = () => {
   const { user, isLoadingUser, refetchUser } = GetUser();
@@ -48,23 +50,18 @@ const Profile = () => {
     });
 
     // replace http://localhost:5000 with PATH_FILE
-    // if (user?.photo) {
-    //   const updatedPhotoURL = user?.photo.replace(
-    //     "http://localhost:5000",
-    //     PATH_FILE
-    //   );
+    if (user?.photo) {
+      const updatedPhotoURL = user?.photo.replace(
+        "http://localhost:5000",
+        PATH_FILE
+      );
 
-    //   console.log("update", updatedPhotoURL);
-
-    //   setNewURLPhoto((prevForm) => ({
-    //     ...prevForm,
-    //     photo: updatedPhotoURL,
-    //   }));
-    // }
+      setNewURLPhoto((prevForm) => ({
+        ...prevForm,
+        photo: updatedPhotoURL,
+      }));
+    }
   }, [user]);
-
-  console.log("form photo", user.photo);
-  // console.log("new photo", newURLPhoto?.photo);
 
   return (
     <SafeAreaView style={styles.containerProfile}>
