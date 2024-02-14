@@ -13,6 +13,7 @@ import Login from "./Login";
 import Home from "./Home";
 import History from "./History";
 import Transfer from "./Transfer";
+import Topup from "./Topup";
 import Profile from "./Profile";
 
 const Tab = createBottomTabNavigator();
@@ -113,6 +114,16 @@ const ContainerNavigation = () => {
           <Stack.Screen
             name="Transfer"
             component={Transfer}
+            options={{
+              headerMode: "screen",
+              headerTitle: "",
+              headerStatusBarHeight: -10,
+              headerTintColor: "#FFFFFF",
+            }}
+          />
+          <Stack.Screen
+            name="Topup"
+            component={Topup}
             options={{
               headerMode: "screen",
               headerTitle: "",

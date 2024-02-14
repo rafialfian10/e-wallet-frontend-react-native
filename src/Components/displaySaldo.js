@@ -1,29 +1,50 @@
-import { StyleSheet, Image, Text, View } from "react-native";
+import { useState } from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { StyleSheet, Image, Text, View, TouchableOpacity } from "react-native";
 
 import Parse from "./parse";
 import { GetUser } from "./Common/Hooks/getUser";
 
 function DisplaySaldo() {
   const { user } = GetUser();
-  const balance = user?.balance?.balance ? user?.balance?.balance.toFixed(2).replace(/\./g, ',') : '0,00';
- 
+  const balance = user?.balance?.balance
+    ? user?.balance?.balance.toFixed(2).replace(/\./g, ",")
+    : "0,00";
+
+  const [showBalance, setShowBalance] = useState(false);
+
+  const handleToggleBalance = () => {
+    setShowBalance(!showBalance);
+  };
   return (
-    <View style={styles.contentSaldo}>
+    <View style={styles.contentBalance}>
       <Image
         source={require("../../assets/logo2.png")}
         alt="logo2"
         style={styles.imgLogo}
       />
-      <View style={styles.subContentSaldo}>
-        <Text style={styles.textSaldo}>Saldo</Text>
-        <Text style={styles.saldo}>Rp. {Parse(balance)}</Text>
+      <View style={styles.subContentBalance}>
+        <View style={styles.contentToggleBalance}>
+          <TouchableOpacity
+            style={styles.toggleBalanceButton}
+            onPress={handleToggleBalance}
+          >
+            <Ionicons
+              name={showBalance ? "eye" : "eye-off"}
+              size={18}
+              color="#FFFFFF"
+            />
+          </TouchableOpacity>
+          <Text style={styles.textBalance}>Balance</Text>
+        </View>
+        {showBalance && <Text style={styles.balance}>Rp. {Parse(balance)}</Text>}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  contentSaldo: {
+  contentBalance: {
     width: "90%",
     marginBottom: 20,
     padding: 10,
@@ -47,24 +68,35 @@ const styles = StyleSheet.create({
     width: "40%",
     height: 50,
   },
-  subContentSaldo: {
+  subContentBalance: {
     width: "60%",
     display: "flex",
     flexDirection: "column",
   },
-  textSaldo: {
-    width: "100%",
+  contentToggleBalance: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  toggleBalanceButton: {
+    textAlign: "center",
+    textAlignVertical: "center",
+  },
+  textBalance: {
+    marginLeft: 5,
     textAlign: "right",
+    textAlignVertical: "center",
     fontSize: 14,
     fontWeight: "bold",
     color: "#FFFFFF",
   },
-  saldo: {
+  balance: {
     width: "100%",
     textAlign: "right",
     fontSize: 18,
     fontWeight: "bold",
-    color: "white",
+    color: "#FFFFFF",
   },
 });
 

@@ -10,7 +10,6 @@ import {
 function DisplayCategory() {
   return (
     <ScrollView style={styles.contentCategory}>
-      <Text style={styles.titleCategory}>Category</Text>
       <View style={styles.subContentCategory}>
         <TouchableOpacity style={styles.listCategory}>
           <Image
@@ -86,21 +85,11 @@ const styles = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
   },
-  titleCategory: {
-    width: "100%",
-    marginBottom: 10,
-    paddingLeft: 15,
-    alignSelf: "center",
-    textAlign: "left",
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#808080",
-  },
   subContentCategory: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
     alignSelf: "center",
     flexWrap: "wrap",
   },
@@ -113,7 +102,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF",
     elevation: 5,
     shadowOpacity: 0.75,
     shadowRadius: 4,
@@ -124,14 +113,14 @@ const styles = StyleSheet.create({
     },
   },
   imgListCategory: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
   },
   textListCategory: {
     width: "100%",
     textAlign: "center",
     textAlignVertical: "center",
-    fontSize: 11,
+    fontSize: 10,
     color: "#000000",
   },
 });

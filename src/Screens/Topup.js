@@ -10,11 +10,10 @@ import {
 } from "react-native";
 
 import FormPin from "../Components/formPin";
-import SearchUsername from "../Components/SearchUsername";
 import ModalTransferSuccess from "../Components/modalTransactionSuccess";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
-const Transfer = ({ navigation }) => {
+const Topup = ({ navigation }) => {
   const { refetchUser } = GetUser();
 
   const [activeButton, setActiveButton] = useState({ active: null });
@@ -28,10 +27,9 @@ const Transfer = ({ navigation }) => {
   const [form, setForm] = useState({
     amount: "",
     pin: "",
-    otherUserId: "",
-    transactionType: "transfer",
+    transactionType: "topup",
   });
-  const [error, setError] = useState({ amount: "", pin: "", otherUserId: "" });
+  const [error, setError] = useState({ amount: "", pin: "" });
 
   const handleChange = (name, value) => {
     setForm({
@@ -56,10 +54,9 @@ const Transfer = ({ navigation }) => {
             : form.amount < 10000
             ? "Amount can't be less than 10000"
             : "",
-        otherUserId: form.otherUserId === "" ? "User is required" : "",
       };
 
-      if (!messageError.amount && !messageError.otherUserId) {
+      if (!messageError.amount) {
         setShowPinForm(true);
       } else {
         setError(messageError);
@@ -70,7 +67,7 @@ const Transfer = ({ navigation }) => {
   };
 
   return showPinForm ? (
-    <SafeAreaView style={styles.containerTransfer}>
+    <SafeAreaView style={styles.containerTopup}>
       <FormPin
         refetchUser={refetchUser}
         form={form}
@@ -90,111 +87,105 @@ const Transfer = ({ navigation }) => {
       />
     </SafeAreaView>
   ) : (
-    <SafeAreaView style={styles.containerTransfer}>
-      <ScrollView style={styles.contentTransfer}>
-        <View style={styles.contentTitleTransfer}>
-          <Text style={styles.titleTransfer}>Transfer Rupiah</Text>
+    <SafeAreaView style={styles.containerTopup}>
+      <ScrollView style={styles.contentTopup}>
+        <View style={styles.contentTitleTopup}>
+          <Text style={styles.titleTopup}>Topup</Text>
         </View>
-        <SearchUsername
-          form={form}
-          setForm={setForm}
-          error={error}
-          setError={setError}
-        />
         <View style={styles.centeredView}>
-          <View style={styles.contentListTransfer}>
+          <View style={styles.contentListTopup}>
             <TouchableOpacity
               style={
                 activeButton.active === 0
-                  ? styles.listTransferActive
-                  : styles.listTransfer
+                  ? styles.listTopupActive
+                  : styles.listTopup
               }
               onPress={() => {
                 setActiveButton({ active: 0 });
                 setForm({ ...form, amount: "50000" });
               }}
             >
-              <Text style={styles.listTextTransfer}>Rp. 50.000</Text>
+              <Text style={styles.listTextTopup}>Rp. 50.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 1
-                  ? styles.listTransferActive
-                  : styles.listTransfer
+                  ? styles.listTopupActive
+                  : styles.listTopup
               }
               onPress={() => {
                 setActiveButton({ active: 1 });
                 setForm({ ...form, amount: "100000" });
               }}
             >
-              <Text style={styles.listTextTransfer}>Rp. 100.000</Text>
+              <Text style={styles.listTextTopup}>Rp. 100.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 2
-                  ? styles.listTransferActive
-                  : styles.listTransfer
+                  ? styles.listTopupActive
+                  : styles.listTopup
               }
               onPress={() => {
                 setActiveButton({ active: 2 });
                 setForm({ ...form, amount: "200000" });
               }}
             >
-              <Text style={styles.listTextTransfer}>Rp. 200.000</Text>
+              <Text style={styles.listTextTopup}>Rp. 200.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 3
-                  ? styles.listTransferActive
-                  : styles.listTransfer
+                  ? styles.listTopupActive
+                  : styles.listTopup
               }
               onPress={() => {
                 setActiveButton({ active: 3 });
                 setForm({ ...form, amount: "300000" });
               }}
             >
-              <Text style={styles.listTextTransfer}>Rp. 300.000</Text>
+              <Text style={styles.listTextTopup}>Rp. 300.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 4
-                  ? styles.listTransferActive
-                  : styles.listTransfer
+                  ? styles.listTopupActive
+                  : styles.listTopup
               }
               onPress={() => {
                 setActiveButton({ active: 4 });
                 setForm({ ...form, amount: "500000" });
               }}
             >
-              <Text style={styles.listTextTransfer}>Rp. 500.000</Text>
+              <Text style={styles.listTextTopup}>Rp. 500.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 5
-                  ? styles.listTransferActive
-                  : styles.listTransfer
+                  ? styles.listTopupActive
+                  : styles.listTopup
               }
               onPress={() => {
                 setActiveButton({ active: 5 });
                 setForm({ ...form, amount: "1000000" });
               }}
             >
-              <Text style={styles.listTextTransfer}>Rp. 1000.000</Text>
+              <Text style={styles.listTextTopup}>Rp. 1000.000</Text>
             </TouchableOpacity>
             <TextInput
-              style={styles.textInputTransfer}
+              style={styles.textInputTopup}
               keyboardType="numeric"
-              placeholder="Set top up amount"
+              placeholder="Set topup amount"
               onChangeText={(value) => handleChange("amount", value)}
               value={form.amount}
             />
             {error.amount && (
-              <Text style={styles.errorTransfer}>{error.amount}</Text>
+              <Text style={styles.errorTopup}>{error.amount}</Text>
             )}
           </View>
-          <View style={styles.contentBtnTransfer}>
-            <TouchableOpacity style={styles.btnTransfer} onPress={handlePIN}>
-              <Text style={styles.btnTextTransfer}>Transfer</Text>
+          <View style={styles.contentBtnTopup}>
+            <TouchableOpacity style={styles.btnTopup} onPress={handlePIN}>
+              <Text style={styles.btnTextTopup}>Topup</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -204,15 +195,15 @@ const Transfer = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  containerTransfer: {
+  containerTopup: {
     flex: 1,
     width: "100%",
     backgroundColor: "#F5F5F5",
   },
-  contentTransfer: {
+  contentTopup: {
     width: "100%",
   },
-  contentTitleTransfer: {
+  contentTitleTopup: {
     width: "100%",
     height: 150,
     marginBottom: 30,
@@ -221,7 +212,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     backgroundColor: "#228B22",
   },
-  titleTransfer: {
+  titleTopup: {
     width: "100%",
     textAlign: "center",
     textAlignVertical: "center",
@@ -234,21 +225,21 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 20,
   },
-  contentListTransfer: {
+  contentListTopup: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     flexWrap: "wrap",
   },
-  listTransfer: {
+  listTopup: {
     width: "30%",
     marginBottom: 15,
     padding: 5,
     borderRadius: 25,
     backgroundColor: "#3CB371",
   },
-  listTextTransfer: {
+  listTextTopup: {
     width: "100%",
     textAlign: "center",
     textAlignVertical: "center",
@@ -256,7 +247,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FFFFFF",
   },
-  textInputTransfer: {
+  textInputTopup: {
     width: "100%",
     height: 50,
     paddingHorizontal: 20,
@@ -268,36 +259,36 @@ const styles = StyleSheet.create({
     borderLeftColor: "transparent",
     borderBottomColor: "#808080",
   },
-  errorTransfer: {
+  errorTopup: {
     width: "100%",
     alignSelf: "center",
     fontSize: 12,
     color: "red",
   },
-  contentBtnTransfer: {
+  contentBtnTopup: {
     width: "100%",
     marginTop: 20,
     display: "flex",
     flexDirection: "row",
     justifyContent: "flex-end",
   },
-  btnTransfer: {
+  btnTopup: {
     width: 90,
     marginHorizontal: 5,
     padding: 10,
     display: "flex",
     justifyContent: "center",
-    alignContent: "center",
+    alignItems: "center",
     borderRadius: 25,
     backgroundColor: "#3CB371",
   },
-  btnTextTransfer: {
+  btnTextTopup: {
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
     textAlignVertical: "center",
   },
-  listTransferActive: {
+  listTopupActive: {
     width: "30%",
     marginBottom: 15,
     padding: 5,
@@ -307,4 +298,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Transfer;
+export default Topup;

@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   },
   contentUserName: {
     width: "100%",
-    height: 100,
+    height: 150,
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
@@ -268,16 +268,16 @@ const styles = StyleSheet.create({
     borderTopColor: "#F5F5F5",
     borderLeftColor: "#F5F5F5",
     borderRightColor: "#F5F5F5",
-    borderBottomColor: "#A9A9A9",
+    borderBottomColor: "#808080",
   },
   textKey: {
     fontSize: 14,
     fontWeight: "700",
+    color: "#000000"
   },
   textValue: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#A9A9A9",
+    color: "#808080",
   },
 });
 

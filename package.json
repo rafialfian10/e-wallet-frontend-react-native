@@ -30,15 +30,16 @@
     "react-native": "0.73.4",
     "react-native-dotenv": "^3.4.10",
     "react-native-dropdown-select-list": "^2.0.5",
+    "react-native-gesture-handler": "~2.14.0",
     "react-native-loading-spinner-overlay": "^3.0.1",
+    "react-native-otp-entry": "^1.4.1",
     "react-native-pagination": "^1.5.5",
     "react-native-safe-area-context": "^4.8.2",
     "react-native-screens": "^3.29.0",
     "react-native-svg": "^14.1.0",
     "react-native-swiper": "^1.6.0",
     "react-native-vector-icons": "^10.0.3",
-    "validator": "^13.11.0",
-    "react-native-gesture-handler": "~2.14.0"
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

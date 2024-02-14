@@ -15,24 +15,27 @@ function ModalTransactionSuccess(props) {
     navigation,
     modalVisible,
     setModalVisible,
-    modalTopupSuccess,
-    setModalTopupSuccess,
+    modalTransactionSuccess,
+    setModalTransactionSuccess,
     dataTransactionSuccess,
   } = props;
 
   const topup = dataTransactionSuccess?.data?.amount
-    ? parseInt(dataTransactionSuccess?.data?.amount).toFixed(2).replace(/\./g, ",")
+    ? parseInt(dataTransactionSuccess?.data?.amount)
+        .toFixed(2)
+        .replace(/\./g, ",")
     : "0,00";
+
+  const transactionType = dataTransactionSuccess?.data?.transactionType;
 
   return (
     <View style={styles.containerModalTransferSuccess}>
       <Modal
         animationType="slide"
         transparent={false}
-        visible={modalTopupSuccess}
+        visible={modalTransactionSuccess}
         onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setModalTopupSuccess(!modalVisible);
+          setModalTransactionSuccess(!modalVisible);
         }}
       >
         <LinearGradient
@@ -50,10 +53,17 @@ function ModalTransactionSuccess(props) {
                   alt="check"
                 />
               </View>
-              <Text style={styles.textStatusTransfer}>{dataTransactionSuccess?.data?.transactionType.charAt(0).toUpperCase() + dataTransactionSuccess?.data?.transactionType.slice(1)} Success</Text>
+              <Text style={styles.textStatusTransfer}>
+                {transactionType
+                  ? transactionType.charAt(0).toUpperCase() +
+                    transactionType.slice(1)
+                  : ""}{" "}
+                Success
+              </Text>
               <Text style={styles.textAmount}>Rp. {Parse(topup)}</Text>
               <Text style={styles.textInfoStatusTransfer}>
-                Your {dataTransactionSuccess?.data?.transactionType} has been successfully
+                Your {dataTransactionSuccess?.data?.transactionType} has been
+                successfully
               </Text>
               <View style={styles.contentBtnDone}>
                 <TouchableOpacity
@@ -63,7 +73,7 @@ function ModalTransactionSuccess(props) {
                     style={styles.textBtnDone}
                     onPress={() => {
                       navigation.navigate("Home");
-                      setModalTopupSuccess(false);
+                      setModalTransactionSuccess(false);
                     }}
                   >
                     Done
@@ -81,7 +91,6 @@ function ModalTransactionSuccess(props) {
 const styles = StyleSheet.create({
   containerModalTransferSuccess: {
     width: "100%",
-    flex: 1,
   },
   containerLinierGradient: {
     flex: 1,
@@ -97,7 +106,7 @@ const styles = StyleSheet.create({
   modalView: {
     width: "90%",
     padding: 15,
-    borderRadius: 20,
+    borderRadius: 25,
     backgroundColor: "#FFFFFF",
     elevation: 5,
     shadowOpacity: 0.75,
@@ -134,20 +143,20 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 20,
     fontWeight: "700",
-    color: "#808080",
+    color: "#A9A9A9",
   },
   textInfoStatusTransfer: {
     width: "100%",
     textAlign: "center",
     fontSize: 16,
     fontWeight: "700",
-    color: "#808080",
+    color: "#A9A9A9",
   },
   contentBtnDone: {
     width: "100%",
     marginTop: 100,
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 25,
     backgroundColor: "#3CB371",
   },
   textBtnDone: {

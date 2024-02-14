@@ -1,6 +1,6 @@
 import { StyleSheet, Image, Text, TouchableOpacity, View } from "react-native";
 
-function DisplayTransaction({ navigation, setModalVisible  }) {
+function DisplayTransaction({ navigation }) {
   return (
     <View style={styles.contentTransaction}>
       <TouchableOpacity style={styles.subContentTransaction}>
@@ -24,7 +24,7 @@ function DisplayTransaction({ navigation, setModalVisible  }) {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.subContentTransaction}
-        onPress={() => setModalVisible(true)}
+        onPress={() => navigation.navigate("Topup")}
       >
         <Image
           source={require("../../assets/top-up.png")}
@@ -53,12 +53,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   imgTransaction: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
   },
   textTransaction: {
-    fontSize: 14,
-    fontWeight: "bold",
+    fontSize: 12,
   },
 });
 

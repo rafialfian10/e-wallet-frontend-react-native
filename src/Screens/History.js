@@ -84,17 +84,17 @@ const History = () => {
           <View style={styles.contentSearch}>
             <TextInput
               style={styles.inputSearch}
-              placeholder="Search by id transaction....."
+              placeholder="Search id transaction..."
               onChangeText={(value) => handleSearch(value)}
               value={search}
             />
           </View>
-          <View style={styles.contentSelectOptions}>
+          <View style={styles.contentSelectList}>
             <SelectList
+              style={styles.selectList}
               setSelected={setOption}
               data={selectOptions}
               save="value"
-              style={styles.selectOptions}
             />
           </View>
           <View style={styles.contentTransactionHistory}>
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   },
   contentTitleHistory: {
     width: "100%",
-    height: 100,
+    height: 150,
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
@@ -175,20 +175,21 @@ const styles = StyleSheet.create({
     height: 50,
     paddingHorizontal: 20,
     fontSize: 14,
+    color: "#000000",
     borderWidth: 1,
     borderColor: "#808080",
   },
-  contentSelectOptions: {
+  contentSelectList: {
     width: "50%",
     marginBottom: 20,
     alignSelf: "flex-end",
   },
-  selectOptions: {
+  selectList: {
+    fontSize: 12,
     borderRadius: 5,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
-    borderWidth: 1,
-    borderColor: "red",
+    color: "red"
   },
   contentTransactionHistory: {
     width: "100%",
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignSelf: "center",
-    borderBottomWidth: 3,
+    borderBottomWidth: 1,
     borderBottomColor: "#808080",
   },
   contentTransactionType: {
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
     height: 30,
     textAlignVertical: "center",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "700",
     color: "#000000",
   },
   textAmount: {

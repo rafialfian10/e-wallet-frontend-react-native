@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { StyleSheet, SafeAreaView, ScrollView, View } from "react-native";
 
 import DisplayProfile from "../Components/displayProfile";
@@ -6,24 +6,15 @@ import DisplaySaldo from "../Components/displaySaldo";
 import DisplayTransaction from "../Components/displayTransaction";
 import DisplayCategory from "../Components/displayCategory";
 import DisplaySwiper from "../Components/displaySwiper";
-import ModalTopup from "../Components/modalTopup";
 import ModalTransactionSuccess from "../Components/modalTransactionSuccess";
-import { UserContext } from "../Context/UserContext";
 
 const Home = ({ navigation }) => {
-  const [state, dispatch] = useContext(UserContext);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTopupSuccess, setModalTopupSuccess] = useState(false);
   const [dataTopupSuccess, setDataTopupSuccess] = useState({
     visible: false,
     data: {},
   });
-
-  const handleTopupSuccess = (data) => {
-    setModalTopupSuccess(true);
-    setDataTopupSuccess({ visible: true, data });
-  };
 
   return (
     <SafeAreaView style={styles.containerHome}>
@@ -32,10 +23,7 @@ const Home = ({ navigation }) => {
           <View style={styles.containerProfile}>
             <DisplayProfile navigation={navigation} />
             <DisplaySaldo />
-            <DisplayTransaction
-              navigation={navigation}
-              setModalVisible={setModalVisible}
-            />
+            <DisplayTransaction navigation={navigation} />
           </View>
         </View>
         <View style={styles.containerCategory}>
@@ -45,20 +33,13 @@ const Home = ({ navigation }) => {
           <DisplaySwiper />
         </View>
       </ScrollView>
-      {modalVisible && (
-        <ModalTopup
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-          handleTopupSuccess={handleTopupSuccess}
-        />
-      )}
       {modalTopupSuccess && (
         <ModalTransactionSuccess
           navigation={navigation}
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
-          modalTopupSuccess={modalTopupSuccess}
-          setModalTopupSuccess={setModalTopupSuccess}
+          modalTransactionSuccess={modalTopupSuccess}
+          setModalTransactionSuccess={setModalTopupSuccess}
           dataTransactionSuccess={dataTopupSuccess}
         />
       )}

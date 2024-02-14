@@ -88,9 +88,9 @@ const styles = StyleSheet.create({
     display: "flex",
     paddingVertical: 10,
     alignItems: "center",
-    fontWeight: "bold",
-    fontSize: 25,
-    color: "#808080",
+    fontWeight: "600",
+    fontSize: 24,
+    color: "#000000",
   },
   contentPhoto: {
     width: "50%",
