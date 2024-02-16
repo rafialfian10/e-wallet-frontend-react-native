@@ -121,7 +121,9 @@ const Register = ({ navigation }) => {
       } else if (form.pin.length !== 6) {
         newErrors.pin = "PIN must be 6 characters long";
         isValid = false;
-      } 
+      } else {
+        newErrors.pin = "";
+      }
     }
 
     setError(newErrors);
