@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
   },
   containerLinierGradient: {
     flex: 1,
+    paddingTop: 100
   },
   contentBtn: {
     marginTop: 150,

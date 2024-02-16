@@ -32,8 +32,6 @@ function FormPin(props) {
     }
   }, [pinCompleted]);
 
-  console.log(form);
-
   const handleTransfer = async () => {
     try {
       const config = {

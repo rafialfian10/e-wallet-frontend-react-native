@@ -196,12 +196,13 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: "100%",
-    alignSelf: "center",
     height: 50,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 25,
-    paddingLeft: 20,
+    paddingHorizontal: 20,
+    alignSelf: "center",
     justifyContent: "center",
+    borderRadius: 25,
+    color: "#808080",
+    backgroundColor: "#FFFFFF",
   },
   togglePasswordButton: {
     position: "absolute",
@@ -210,10 +211,10 @@ const styles = StyleSheet.create({
   },
   errorLogin: {
     width: "100%",
+    paddingHorizontal: 10,
     alignSelf: "center",
     fontSize: 11,
     color: "red",
-    paddingHorizontal: 5,
   },
   btn: {
     width: "75%",

@@ -1,129 +1,136 @@
 import { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import Ionicons from '@expo/vector-icons/Ionicons';
-import validator from "validator";
+import { AntDesign } from "@expo/vector-icons";
 import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
   View,
-  TextInput,
   Text,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 
 import DisplayLogo from "../Components/displayLogo";
-import { API } from "../Config/Api";
+import FormRegister1 from "../Components/formRegister1";
+import FormRegister2 from "../Components/formRegister2";
+import FormRegister3 from "../Components/formRegister3";
+import FormRegister4 from "../Components/formRegister4";
 
 const Register = ({ navigation }) => {
+  const [screen, setScreen] = useState(0);
+  const formTitle = [
+    "Enter Personal Data",
+    "Enter Phone Number",
+    "Create PIN",
+    "Confirm PIN",
+  ];
   const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
+    phone: "",
+    pin: "",
+    confirmPin: "",
   });
-
   const [error, setError] = useState({
     username: "",
     email: "",
     password: "",
+    phone: "",
+    pin: "",
+    confirmPin: "",
   });
+  console.log(error);
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleTogglePassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleChange = (data, value) => {
-    setForm({
-      ...form,
-      [data]: value,
-    });
-
-    if (data === "username") {
-      setError((prevError) => ({
-        ...prevError,
-        userName: value.trim() === "" ? "Username is required" : "",
-      }));
-    }
-
-    if (data === "email") {
-      if (value.trim() === "") {
-        setError((prevError) => ({
-          ...prevError,
-          email: "Email is required",
-        }));
-      } else if (!validator.isEmail(value)) {
-        setError((prevError) => ({
-          ...prevError,
-          email: "Please enter a valid email address",
-        }));
-      } else {
-        setError((prevError) => ({
-          ...prevError,
-          email: "",
-        }));
-      }
-    }
-
-    if (data === "password") {
-      setError((prevError) => ({
-        ...prevError,
-        password: value.trim() === "" ? "Password is required" : "",
-      }));
-
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d.)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{8,}$/;
-
-      if (value.trim() !== "" && !passwordRegex.test(value)) {
-        setError((prevError) => ({
-          ...prevError,
-          password:
-            "Password must be at least 8 characters and include at least one uppercase letter, one lowercase letter, one digit, and one special character",
-        }));
-      }
+  const screenDisplay = () => {
+    if (screen === 0) {
+      return (
+        <FormRegister1
+          form={form}
+          setForm={setForm}
+          error={error}
+          setError={setError}
+        />
+      );
+    } else if (screen === 1) {
+      return (
+        <FormRegister2
+          form={form}
+          setForm={setForm}
+          error={error}
+          setError={setError}
+        />
+      );
+    } else if (screen === 2) {
+      return (
+        <FormRegister3
+          form={form}
+          setForm={setForm}
+          error={error}
+          setError={setError}
+        />
+      );
+    } else if (screen === 3) {
+      return (
+        <FormRegister4
+          navigation={navigation}
+          form={form}
+          setForm={setForm}
+          error={error}
+          setError={setError}
+        />
+      );
     }
   };
 
-  const handleSubmit = async () => {
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-
-      const messageError = {
-        username: form.username === "" ? "Username is required" : "",
-        email: form.email === "" ? "Email is required" : "",
-        password: form.password === "" ? "Password is required" : "",
-      };
-
-      if (
-        !messageError.username &&
-        !messageError.email &&
-        !messageError.password
-      ) {
-        const body = JSON.stringify(form);
-
-        try {
-          const response = await API.post("/register", body, config);
-          if (response?.data?.status === 200) {
-            alert("Register successfully");
-            navigation.navigate("Login");
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 400) {
-            alert(error.response.data.message);
-          } else {
-            throw error;
-          }
-        }
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { ...error };
+    if (screen === 0) {
+      if (form.username.trim() === "") {
+        newErrors.username = "Username is required";
+        isValid = false;
       } else {
-        setError(messageError);
+        newErrors.username = "";
       }
-    } catch (error) {
-      console.log("register failed", error);
+
+      if (form.email.trim() === "") {
+        newErrors.email = "Email is required";
+        isValid = false;
+      } else {
+        newErrors.email = "";
+      }
+
+      if (form.password.trim() === "") {
+        newErrors.password = "Password is required";
+        isValid = false;
+      } else {
+        newErrors.password = "";
+      }
+    } else if (screen === 1) {
+      if (form.phone.trim() === "") {
+        newErrors.phone = "Phone is required";
+        isValid = false;
+      } else {
+        newErrors.phone = "";
+      }
+    } else if (screen === 2) {
+      if (form.pin.trim() === "") {
+        newErrors.pin = "PIN is required";
+        isValid = false;
+      } else if (form.pin.length !== 6) {
+        newErrors.pin = "PIN must be 6 characters long";
+        isValid = false;
+      } 
+    }
+
+    setError(newErrors);
+    return isValid;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      setScreen((currScreen) => currScreen + 1);
     }
   };
 
@@ -136,67 +143,25 @@ const Register = ({ navigation }) => {
         style={styles.containerLinierGradient}
       >
         <ScrollView style={styles.contentRegister}>
+          <View style={styles.contentNavigationRegister}>
+            <Pressable
+              disabled={screen === 0}
+              onPress={() => {
+                setScreen((currScreen) => currScreen - 1);
+              }}
+            >
+              <AntDesign name="left" size={26} color="#000000" />
+            </Pressable>
+            <Pressable disabled={screen === 3} onPress={handleNext}>
+              <AntDesign name="right" size={26} color="#000000" />
+            </Pressable>
+          </View>
           <DisplayLogo />
           <Text style={styles.title}>Register</Text>
           <View style={styles.containerInput}>
-            <View style={styles.contentInput}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Username"
-                onChangeText={(value) => handleChange("username", value)}
-                value={form.username}
-              />
-              {error.username && (
-                <Text style={styles.errorRegister}>{error.username}</Text>
-              )}
-            </View>
-            <View style={styles.contentInput}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Email"
-                onChangeText={(value) => handleChange("email", value)}
-                value={form.email}
-              />
-              {error.email && (
-                <Text style={styles.errorRegister}>{error.email}</Text>
-              )}
-            </View>
-            <View style={styles.contentInput}>
-              <TextInput
-                style={styles.textInput}
-                placeholder="Password"
-                secureTextEntry={!showPassword}
-                onChangeText={(value) => handleChange("password", value)}
-                value={form.password}
-              />
-              <TouchableOpacity
-                style={styles.togglePasswordButton}
-                onPress={handleTogglePassword}
-              >
-                <Ionicons
-                  name={showPassword ? "eye" : "eye-off"}
-                  size={20}
-                  color="#808080"
-                />
-              </TouchableOpacity>
-              {error.password && (
-                <Text style={styles.errorRegister}>{error.password}</Text>
-              )}
-            </View>
+            <Text style={styles.formTitle}>{formTitle[screen]}</Text>
+            {screenDisplay()}
           </View>
-          <TouchableOpacity onPress={handleSubmit} style={styles.btn}>
-            <Text style={styles.btnText}>Register</Text>
-          </TouchableOpacity>
-          <Text style={styles.textLogin}>
-            Joined us before?
-            <Text
-              onPress={() => navigation.navigate("Login")}
-              style={styles.linkLogin}
-            >
-              {" "}
-              Login
-            </Text>
-          </Text>
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
@@ -213,72 +178,37 @@ const styles = StyleSheet.create({
   contentRegister: {
     marginTop: 80,
   },
+  contentNavigationRegister: {
+    width: "100%",
+    top: 0,
+    padding: 5,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    zIndex: 10,
+  },
   title: {
     width: "75%",
-    marginTop: 150,
-    marginBottom: 15,
+    marginTop: 50,
+    marginBottom: 10,
     alignSelf: "center",
     fontSize: 25,
+    fontWeight: "bold",
+    color: "#808080",
+  },
+  formTitle: {
+    width: "75%",
+    marginVertical: 25,
+    alignSelf: "center",
+    textAlign: "center",
+    textAlignVertical: "center",
+    fontSize: 15,
     fontWeight: "bold",
     color: "#808080",
   },
   containerInput: {
     width: "75%",
     alignSelf: "center",
-  },
-  contentInput: {
-    width: "100%",
-    marginBottom: 10,
-    borderRadius: 25,
-    overflow: "hidden",
-  },
-  textInput: {
-    width: "100%",
-    alignSelf: "center",
-    height: 50,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 25,
-    paddingLeft: 20,
-    justifyContent: "center",
-
-  },
-  togglePasswordButton: {
-    position: "absolute",
-    right: 15,
-    top: 15,
-  },
-  errorRegister: {
-    width: "100%",
-    paddingHorizontal: 5,
-    alignSelf: "center",
-    textAlign: "justify",
-    fontSize: 11,
-    color: "red",
-  },
-  btn: {
-    width: "75%",
-    height: 50,
-    padding: 10,
-    display: "flex",
-    alignSelf: "center",
-    justifyContent: "center",
-    borderRadius: 50,
-    marginTop: 20,
-    backgroundColor: "#3CB371",
-  },
-  btnText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
-    textAlign: "center",
-  },
-  textLogin: {
-    marginTop: 5,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  linkLogin: {
-    color: "#3CB371",
-    fontWeight: "800",
   },
 });
 

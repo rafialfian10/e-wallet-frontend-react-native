@@ -24,7 +24,7 @@ export default DisplayLogo;
 
 const styles = StyleSheet.create({
     containerLogo: {
-      marginTop: 100,
+      marginTop: 20,
       display: "flex",
       flexDirection: "row",
       justifyContent: "center",
