@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Image, TouchableOpacity, Pressable } from "react-native";
 
 import { PATH_FILE } from "@env";
 import { GetUser } from "./Common/Hooks/getUser";
@@ -42,7 +42,7 @@ function DisplayProfile({ navigation }) {
   return (
     <View style={styles.contentProfile}>
       <Text style={styles.textProfile}>Hi {user?.username}</Text>
-      <TouchableOpacity
+      <Pressable
         style={styles.contentPhoto}
         onPress={() => setShowLogout(!showLogout)}
       >
@@ -67,7 +67,7 @@ function DisplayProfile({ navigation }) {
             </Text>
           </TouchableOpacity>
         )}
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }

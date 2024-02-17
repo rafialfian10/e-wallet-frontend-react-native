@@ -1,10 +1,9 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useContext } from "react";
 import { SelectList } from "react-native-dropdown-select-list";
 import Spinner from "react-native-loading-spinner-overlay";
 import {
   StyleSheet,
   SafeAreaView,
-  ScrollView,
   View,
   Text,
   TextInput,
@@ -15,16 +14,25 @@ import {
 
 import { GetTransactionsUser } from "../Components/Common/Hooks/getTransactionsUser";
 import DisplayHistory from "../Components/displayHistory";
+import { UserContext } from "../Context/UserContext";
 
 const History = () => {
+  const [state, dispatch] = useContext(UserContext);
+  const token = state?.user?.token 
+
+  const [search, setSearch] = useState("");
+  const [option, setOption] = useState("");
+  const [page, setPage] = useState(1);
+
   const {
     transactionsUser,
     isLoadingTransactionUser,
     refetchTransactionsUser,
-  } = GetTransactionsUser();
+  } = GetTransactionsUser(page);
 
-  const [search, setSearch] = useState("");
-  const [option, setOption] = useState("");
+  // useEffect(() => {
+  //   refetchTransactionsUser();
+  // }, [page]);
 
   const selectOptions = [
     { key: "", value: "all" },
@@ -69,52 +77,54 @@ const History = () => {
     });
   }, [transactionsUser, search, option]);
 
-  const [currentPageItems, setCurrentPageItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [currentPageData, setCurrentPageData] = useState([]);
+  const [offset, setOffset] = useState(1);
+  const [isListEnd, setIsListEnd] = useState(false);
 
-  useEffect(() => {
-    const startIndex = (page - 1) * 10;
-    const endIndex = startIndex + 10;
-    setCurrentPageItems(transactionsHistory.slice(startIndex, endIndex));
-  }, [transactionsHistory, page]);
+  useEffect(() => getData(), []);
 
-  const fetchPage = async () => {
-    if (loading || page >= totalPages) {
-      return;
+  const getData = () => {
+    if (!loading && !isListEnd) {
+      setLoading(true);
+      fetch(
+        "http://192.168.88.106:5000/api/v1/transactions-by-user?page=" + offset, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          console.log(responseJson);
+          if (responseJson?.data?.length > 0) {
+            setOffset(offset + 1);
+            setCurrentPageData([...currentPageData, ...responseJson?.data]);
+            setLoading(false);
+          } else {
+            setIsListEnd(true);
+            setLoading(false);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
-  
-    setLoading(true);
-  
-    // Menunggu hingga transactionsHistory terinisialisasi
-    if (!transactionsHistory) {
-      await refetchTransactionsUser();
-    }
-  
-    // Memperbarui data halaman saat ini
-    const startIndex = (page - 1) * 10;
-    const endIndex = startIndex + 10;
-    const nextPageItems = transactionsHistory ? transactionsHistory.slice(startIndex, endIndex) : [];
-  
-    setCurrentPageItems((prevItems) => [...prevItems, ...nextPageItems]);
-  
-    // Memperbarui halaman selanjutnya
-    setPage((prevPage) => prevPage + 1);
-    setLoading(false);
+  };
+
+  const renderFooter = () => {
+    return (
+      <View style={styles.footer}>
+        {loading ? (
+          <ActivityIndicator color="black" style={{ margin: 15 }} />
+        ) : null}
+      </View>
+    );
   };
 
   const renderItem = useCallback(
     ({ item }) => <DisplayHistory transaction={item} />,
     []
   );
-
-  if (transactionsHistory?.length === 0) {
-    return null;
-  }
-
-  const { width, height } = useWindowDimensions();
-  const itemHeight = width + 500;
 
   return (
     <SafeAreaView style={styles.containerHistory}>
@@ -133,7 +143,7 @@ const History = () => {
             <View style={styles.contentSearch}>
               <TextInput
                 style={styles.inputSearch}
-                placeholder="Search by id transaction....."
+                placeholder="Search id transaction....."
                 onChangeText={(value) => handleSearch(value)}
                 value={search}
               />
@@ -147,24 +157,18 @@ const History = () => {
               />
             </View>
           </View>
-          {/* <View style={styles.containerPagination}>
+          <View style={styles.containerPagination}>
             <FlatList
-              data={currentPageItems}
+              data={currentPageData}
+              keyExtractor={(item, index) => index.toString()}
+              // ItemSeparatorComponent={ItemSeparatorView}
               renderItem={renderItem}
-              onEndReached={fetchPage}
+              ListFooterComponent={renderFooter}
+              onEndReached={getData}
               onEndReachedThreshold={0.5}
-              ListFooterComponent={() => loading && <ActivityIndicator />}
-              refreshing={loading}
-              // onRefresh={onRefresh}
-              // debug
-              initialNumToRender={1}
-              getItemLayout={(data, index) => ({
-                length: itemHeight,
-                offset: (itemHeight + 10) * index,
-                index,
-              })}
+              contentContainerStyle={{height: "auto", paddingBottom: 300}}
             />
-          </View> */}
+          </View>
         </>
       )}
     </SafeAreaView>
@@ -225,8 +229,6 @@ const styles = StyleSheet.create({
   },
   containerPagination: {
     width: "100%",
-    borderColor: "red",
-    borderWidth: 2,
   },
 });
 

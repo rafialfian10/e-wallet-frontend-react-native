@@ -1,29 +1,36 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { SelectList } from "react-native-dropdown-select-list";
 import Spinner from "react-native-loading-spinner-overlay";
-import moment from "moment/moment";
 import {
   StyleSheet,
   SafeAreaView,
-  ScrollView,
   View,
   Text,
   TextInput,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 
-import Parse from "../Components/parse";
 import { GetTransactionsUser } from "../Components/Common/Hooks/getTransactionsUser";
+import DisplayHistory from "../Components/displayHistory";
 
 const History = () => {
+  const [search, setSearch] = useState("");
+  const [option, setOption] = useState("");
+
+  const [currentPageData, setCurrentPageData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [isListEnd, setIsListEnd] = useState(false);
+
   const {
     transactionsUser,
     isLoadingTransactionUser,
     refetchTransactionsUser,
-  } = GetTransactionsUser();
+  } = GetTransactionsUser(page);
 
-  const [search, setSearch] = useState("");
-  const [option, setOption] = useState("");
+  useEffect(() => {
+    refetchTransactionsUser();
+  }, [page]);
 
   const selectOptions = [
     { key: "", value: "all" },
@@ -33,9 +40,12 @@ const History = () => {
 
   const handleSearch = (value) => {
     setSearch(value);
-    if (value !== "") {
-      setOption("");
-    }
+    setPage(1);
+  };
+
+  const handleOptionChange = (value) => {
+    setOption(value);
+    setPage(1);
   };
 
   useEffect(() => {
@@ -43,9 +53,13 @@ const History = () => {
     if (option !== "") {
       setSearch("");
     }
-  }, [option]);
 
-  const transactionsHistory = useMemo(() => {
+    if(search !== "") {
+      setOption("")
+    }
+  }, [search, option]);
+
+  const filteredTransactions = useMemo(() => {
     if ((search === "" && option === "") || option === "all") {
       return transactionsUser;
     }
@@ -68,68 +82,79 @@ const History = () => {
     });
   }, [transactionsUser, search, option]);
 
+  // pagination
+  const getData = () => {
+    if (!isLoadingTransactionUser && !isListEnd) {
+      try {
+        if (filteredTransactions?.length > 0) {
+          setPage(page + 1);
+          setCurrentPageData([...currentPageData, ...filteredTransactions]);
+        } else {
+          setIsListEnd(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const renderFooter = () => {
+    return (
+      <View style={styles.footer}>
+        {isLoadingTransactionUser ? (
+          <ActivityIndicator color="black" size={24} />
+        ) : null}
+      </View>
+    );
+  };
+
+  const renderItem = useCallback(
+    ({ item }) => <DisplayHistory transaction={item} />,
+    []
+  );
+
+  useEffect(() => getData(), []);
+
+  //  useEffect(() => {
+  //   setCurrentPageData(filteredTransactions?.slice(0, page * 10));
+  //   setIsListEnd(filteredTransactions?.length <= page * 10);
+  // }, [filteredTransactions, page]);
+
   return (
     <SafeAreaView style={styles.containerHistory}>
-      {isLoadingTransactionUser ? (
-        <Spinner
-          visible={isLoadingTransactionUser}
-          textContent={"Loading..."}
-          textStyle={styles.spinner}
+      <View style={styles.contentHistory}>
+        <View style={styles.contentTitleHistory}>
+          <Text style={styles.title}>Transactions History</Text>
+        </View>
+        <View style={styles.contentSearch}>
+          <TextInput
+            style={styles.inputSearch}
+            placeholder="Search id transaction....."
+            onChangeText={handleSearch}
+            value={search}
+          />
+        </View>
+        <View style={styles.contentSelectOptions}>
+          <SelectList
+            setSelected={handleOptionChange}
+            data={selectOptions}
+            save="value"
+            style={styles.selectOptions}
+          />
+        </View>
+      </View>
+      <View style={styles.containerPagination}>
+        <FlatList
+          data={currentPageData}
+          keyExtractor={(item, index) => index.toString()}
+          // ItemSeparatorComponent={ItemSeparatorView}
+          renderItem={renderItem}
+          ListFooterComponent={renderFooter}
+          onEndReached={getData}
+          onEndReachedThreshold={0.5}
+          contentContainerStyle={{ height: "auto", paddingBottom: 300 }}
         />
-      ) : (
-        <ScrollView style={styles.contentHistory}>
-          <View style={styles.contentTitleHistory}>
-            <Text style={styles.title}>Transactions History</Text>
-          </View>
-          <View style={styles.contentSearch}>
-            <TextInput
-              style={styles.inputSearch}
-              placeholder="Search id transaction..."
-              onChangeText={(value) => handleSearch(value)}
-              value={search}
-            />
-          </View>
-          <View style={styles.contentSelectList}>
-            <SelectList
-              style={styles.selectList}
-              setSelected={setOption}
-              data={selectOptions}
-              save="value"
-            />
-          </View>
-          <View style={styles.contentTransactionHistory}>
-            {transactionsHistory?.map((transaction, i) => {
-              const amount = transaction?.amount
-                ? transaction?.amount.toFixed(2).replace(/\./g, ",")
-                : "0,00";
-              return (
-                <View style={styles.subContentTransactionHistory} key={i}>
-                  <View style={styles.contentTransactionType}>
-                    <Text style={styles.textTransaction}>
-                      {transaction?.transactionType}
-                    </Text>
-                    <Text style={styles.textAmount}>Rp. {Parse(amount)}</Text>
-                  </View>
-                  <View style={styles.contentTransactionDate}>
-                    <Text style={styles.textId}>
-                      {transaction?.id.length > 30
-                        ? transaction?.id.substring(0, 27) + "..."
-                        : transaction?.id}
-                    </Text>
-                    <Text style={styles.textDate}>
-                      {transaction?.transactionDate
-                        ? moment(transaction.transactionDate).format(
-                            "DD MMMM YYYY, HH:mm:ss"
-                          )
-                        : ""}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        </ScrollView>
-      )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -137,7 +162,6 @@ const History = () => {
 const styles = StyleSheet.create({
   containerHistory: {
     flex: 1,
-    height: "100%",
     backgroundColor: "#F5F5F5",
   },
   spinner: {
@@ -149,11 +173,10 @@ const styles = StyleSheet.create({
   },
   contentHistory: {
     width: "100%",
-    flex: 1,
   },
   contentTitleHistory: {
     width: "100%",
-    height: 150,
+    height: 100,
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
@@ -175,77 +198,26 @@ const styles = StyleSheet.create({
     height: 50,
     paddingHorizontal: 20,
     fontSize: 14,
-    color: "#000000",
     borderWidth: 1,
     borderColor: "#808080",
   },
-  contentSelectList: {
+  contentSelectOptions: {
     width: "50%",
-    marginBottom: 20,
+    marginBottom: 10,
     alignSelf: "flex-end",
   },
-  selectList: {
-    fontSize: 12,
+  selectOptions: {
     borderRadius: 5,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
-    color: "red"
-  },
-  contentTransactionHistory: {
-    width: "100%",
-    marginBottom: 30,
-  },
-  subContentTransactionHistory: {
-    width: "95%",
-    marginBottom: 15,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignSelf: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#808080",
-  },
-  contentTransactionType: {
-    width: "30%",
-    display: "flex",
-    flexDirection: "column",
-  },
-  textTransaction: {
-    width: "100%",
-    height: 30,
-    textAlignVertical: "center",
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#000000",
-  },
-  textAmount: {
-    width: "100%",
-    fontSize: 12,
-    color: "#808080",
-  },
-  contentTransactionDate: {
-    width: "70%",
-    display: "flex",
-    flexDirection: "column",
-  },
-  textId: {
-    width: "100%",
-    height: 30,
-    textAlign: "right",
-    textAlignVertical: "center",
-    fontSize: 12,
-    color: "#000000",
-  },
-  textDate: {
-    width: "100%",
-    textAlign: "right",
-    fontSize: 12,
-    color: "#808080",
   },
   containerPagination: {
     width: "100%",
-    marginBottom: 30,
   },
+  footer: {
+    width: "100%",
+    padding: 15,
+  }
 });
 
 export default History;
