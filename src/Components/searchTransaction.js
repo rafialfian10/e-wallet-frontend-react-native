@@ -3,8 +3,10 @@ import { StyleSheet, View, TextInput } from "react-native";
 
 function SearchTransaction({
   transactionsUser,
+  refetchTransactionsUser,
   search,
   setSearch,
+  setOption,
   page,
   setPage,
   currentPageData,
@@ -14,23 +16,39 @@ function SearchTransaction({
   const handleSearch = (value) => {
     setSearch(value);
     setPage(1);
+    filterData(value);
+    setOption("");
   };
 
-  useEffect(() => {
-    if (search !== "") {
+  const filterData = (value) => {
+    if (value !== "") {
       const filteredData = transactionsUser?.filter((transaction) =>
-        transaction.id.toLowerCase().includes(search.toLowerCase())
+        transaction?.id.toLowerCase().includes(value.toLowerCase())
       );
+
       setCurrentPageData(filteredData);
     } else {
       if (transactionsUser?.length > 0) {
-        setPage(page + 1);
-        setCurrentPageData([...currentPageData, ...transactionsUser]);
+        if (page === 1) {
+          setCurrentPageData(transactionsUser);
+          setPage(page + 1);
+        } else {
+          setCurrentPageData([...currentPageData, ...transactionsUser]);
+          setPage(page + 1);
+        }
       } else {
         setIsListEnd(true);
       }
     }
+  };
+
+  useEffect(() => {
+    filterData(search);
   }, [transactionsUser, search]);
+
+  useEffect(() => {
+    refetchTransactionsUser();
+  }, [search]);
 
   return (
     <View style={styles.contentSearch}>

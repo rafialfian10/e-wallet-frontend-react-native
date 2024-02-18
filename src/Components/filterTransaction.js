@@ -7,6 +7,7 @@ function FilterTransaction({
   refetchTransactionsUser,
   option,
   setOption,
+  setSearch,
   page,
   setPage,
   currentPageData,
@@ -14,39 +15,42 @@ function FilterTransaction({
   setIsListEnd,
 }) {
   const selectOptions = [
-    { key: "", value: "all" },
-    { key: "transfer", value: "transfer" },
-    { key: "topup", value: "topup" },
+    { key: "", value: "All" },
+    { key: "transfer", value: "Transfer" },
+    { key: "topup", value: "Topup" },
   ];
 
   const handleOption = (value) => {
     setOption(value);
     setPage(1);
+    filterData(value);
+    setSearch("");
+  };
+
+  const filterData = (value) => {
+    if (value !== "") {
+      const filteredData = transactionsUser?.filter(
+        (transaction) =>
+          transaction?.transactionType.toLowerCase() === value.toLowerCase()
+      );
+
+      if (filteredData?.length > 0) {
+        if (page === 1) {
+          setCurrentPageData(filteredData);
+        } else {
+          setCurrentPageData([...currentPageData, ...filteredData]);
+        }
+        setIsListEnd(false);
+      }
+    }
   };
 
   useEffect(() => {
-    if (option !== "") {
-      const filteredData = transactionsUser?.filter((transaction) =>
-        transaction.transactionsType
-          .toLowerCase()
-          .includes(option.toLowerCase())
-      );
-      setCurrentPageData(filteredData);
-    } else {
-      if (transactionsUser?.length > 0) {
-        setPage(page + 1);
-        setCurrentPageData([...currentPageData, ...transactionsUser]);
-      } else {
-        setIsListEnd(true);
-      }
-    }
-  }, [transactionsUser, search]);
+    filterData(option);
+  }, [transactionsUser, option]);
 
   useEffect(() => {
     refetchTransactionsUser();
-    if (option !== "") {
-      setSearch("");
-    }
   }, [option]);
 
   return (

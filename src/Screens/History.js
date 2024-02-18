@@ -34,7 +34,7 @@ const History = () => {
   const getData = () => {
     try {
       if (!isLoadingTransactionUser && !isListEnd) {
-        if (transactionsUser?.length > 0) {
+        if (transactionsUser && transactionsUser?.length > 0) {
           setPage(page + 1);
           setCurrentPageData([...currentPageData, ...transactionsUser]);
         } else {
@@ -69,8 +69,30 @@ const History = () => {
         <View style={styles.contentTitleHistory}>
           <Text style={styles.title}>Transactions History</Text>
         </View>
-        <SearchTransaction transactionsUser={transactionsUser} search={search} setSearch={setSearch} page={page} setPage={setPage} currentPageData={currentPageData} setCurrentPageData={setCurrentPageData} setIsListEnd={setIsListEnd} />
-        <FilterTransaction transactionsUser={transactionsUser} refetchTransactionsUser={refetchTransactionsUser} option={option}setOption={setOption} page={page} setPage={setPage} currentPageData={currentPageData} setCurrentPageData={setCurrentPageData} setIsListEnd={setIsListEnd}/>
+        <SearchTransaction
+          transactionsUser={transactionsUser}
+          refetchTransactionsUser={refetchTransactionsUser}
+          search={search}
+          setSearch={setSearch}
+          setOption={setOption}
+          page={page}
+          setPage={setPage}
+          currentPageData={currentPageData}
+          setCurrentPageData={setCurrentPageData}
+          setIsListEnd={setIsListEnd}
+        />
+        <FilterTransaction
+          transactionsUser={transactionsUser}
+          refetchTransactionsUser={refetchTransactionsUser}
+          option={option}
+          setOption={setOption}
+          setSearch={setSearch}
+          page={page}
+          setPage={setPage}
+          currentPageData={currentPageData}
+          setCurrentPageData={setCurrentPageData}
+          setIsListEnd={setIsListEnd}
+        />
       </View>
       <View style={styles.containerPagination}>
         <FlatList
