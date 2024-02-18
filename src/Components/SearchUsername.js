@@ -33,8 +33,10 @@ const SearchUsername = ({ form, setForm, error, setError }) => {
   };
 
   const filteredUsers = users
-    ? users.filter((user) =>
-        user?.username.toLowerCase().includes(search.toLowerCase())
+    ? users.filter(
+        (user) =>
+          user?.role?.id === 3 &&
+          user?.username.toLowerCase().includes(search.toLowerCase())
       )
     : [];
 
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 25,
     borderWidth: 1,
-    borderColor: "#A9A9A9",
+    borderColor: "#808080",
   },
   contentUsername: {
     width: "100%",
@@ -108,7 +110,7 @@ const styles = StyleSheet.create({
   },
   textUsername: {
     fontSize: 14,
-    color: "#A9A9A9",
+    color: "#808080",
     borderTopColor: "transparent",
     borderRightColor: "transparent",
     borderLeftColor: "transparent",
