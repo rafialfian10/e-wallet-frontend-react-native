@@ -1,18 +1,17 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { SelectList } from "react-native-dropdown-select-list";
-import Spinner from "react-native-loading-spinner-overlay";
+import { useState, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   SafeAreaView,
   View,
   Text,
-  TextInput,
   FlatList,
   ActivityIndicator,
 } from "react-native";
 
-import { GetTransactionsUser } from "../Components/Common/Hooks/getTransactionsUser";
 import DisplayHistory from "../Components/displayHistory";
+import SearchTransaction from "../Components/searchTransaction";
+import FilterTransaction from "../Components/filterTransaction";
+import { GetTransactionsUser } from "../Components/Common/Hooks/getTransactionsUser";
 
 const History = () => {
   const [search, setSearch] = useState("");
@@ -32,69 +31,18 @@ const History = () => {
     refetchTransactionsUser();
   }, [page]);
 
-  const selectOptions = [
-    { key: "", value: "all" },
-    { key: "transfer", value: "transfer" },
-    { key: "topup", value: "topup" },
-  ];
-
-  const handleSearch = (value) => {
-    setSearch(value);
-    setPage(1);
-  };
-
-  const handleOptionChange = (value) => {
-    setOption(value);
-    setPage(1);
-  };
-
-  useEffect(() => {
-    refetchTransactionsUser();
-    if (option !== "") {
-      setSearch("");
-    }
-
-    if(search !== "") {
-      setOption("")
-    }
-  }, [search, option]);
-
-  const filteredTransactions = useMemo(() => {
-    if ((search === "" && option === "") || option === "all") {
-      return transactionsUser;
-    }
-
-    return transactionsUser?.filter((transaction) => {
-      const isOption = transaction.transactionType
-        .toLowerCase()
-        .includes(option.toLowerCase());
-      const isSearch = transaction.id
-        .toLowerCase()
-        .includes(search.toLowerCase());
-
-      if (search !== "") {
-        return isSearch;
-      } else if (option !== "") {
-        return isOption;
-      } else {
-        return isOption && isSearch;
-      }
-    });
-  }, [transactionsUser, search, option]);
-
-  // pagination
   const getData = () => {
-    if (!isLoadingTransactionUser && !isListEnd) {
-      try {
-        if (filteredTransactions?.length > 0) {
+    try {
+      if (!isLoadingTransactionUser && !isListEnd) {
+        if (transactionsUser?.length > 0) {
           setPage(page + 1);
-          setCurrentPageData([...currentPageData, ...filteredTransactions]);
+          setCurrentPageData([...currentPageData, ...transactionsUser]);
         } else {
           setIsListEnd(true);
         }
-      } catch (error) {
-        console.log(error);
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -115,33 +63,14 @@ const History = () => {
 
   useEffect(() => getData(), []);
 
-  //  useEffect(() => {
-  //   setCurrentPageData(filteredTransactions?.slice(0, page * 10));
-  //   setIsListEnd(filteredTransactions?.length <= page * 10);
-  // }, [filteredTransactions, page]);
-
   return (
     <SafeAreaView style={styles.containerHistory}>
       <View style={styles.contentHistory}>
         <View style={styles.contentTitleHistory}>
           <Text style={styles.title}>Transactions History</Text>
         </View>
-        <View style={styles.contentSearch}>
-          <TextInput
-            style={styles.inputSearch}
-            placeholder="Search id transaction....."
-            onChangeText={handleSearch}
-            value={search}
-          />
-        </View>
-        <View style={styles.contentSelectOptions}>
-          <SelectList
-            setSelected={handleOptionChange}
-            data={selectOptions}
-            save="value"
-            style={styles.selectOptions}
-          />
-        </View>
+        <SearchTransaction transactionsUser={transactionsUser} search={search} setSearch={setSearch} page={page} setPage={setPage} currentPageData={currentPageData} setCurrentPageData={setCurrentPageData} setIsListEnd={setIsListEnd} />
+        <FilterTransaction transactionsUser={transactionsUser} refetchTransactionsUser={refetchTransactionsUser} option={option}setOption={setOption} page={page} setPage={setPage} currentPageData={currentPageData} setCurrentPageData={setCurrentPageData} setIsListEnd={setIsListEnd}/>
       </View>
       <View style={styles.containerPagination}>
         <FlatList
@@ -190,34 +119,13 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FFFFFF",
   },
-  contentSearch: {
-    width: "100%",
-  },
-  inputSearch: {
-    width: "100%",
-    height: 50,
-    paddingHorizontal: 20,
-    fontSize: 14,
-    borderWidth: 1,
-    borderColor: "#808080",
-  },
-  contentSelectOptions: {
-    width: "50%",
-    marginBottom: 10,
-    alignSelf: "flex-end",
-  },
-  selectOptions: {
-    borderRadius: 5,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-  },
   containerPagination: {
     width: "100%",
   },
   footer: {
     width: "100%",
     padding: 15,
-  }
+  },
 });
 
 export default History;
