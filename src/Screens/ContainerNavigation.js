@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { UserContext } from "../Context/UserContext";
@@ -14,6 +14,7 @@ import Home from "./Home";
 import History from "./History";
 import Transfer from "./Transfer";
 import Topup from "./Topup";
+import Message from "./Message";
 import Profile from "./Profile";
 
 const Tab = createBottomTabNavigator();
@@ -36,12 +37,14 @@ function MyTab() {
           let iconName;
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
+            return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === "History") {
             iconName = focused ? "receipt" : "receipt-outline";
-          } else if (route.name === "Profile") {
-            iconName = focused ? "person" : "person-outline";
+            return <Ionicons name={iconName} size={size} color={color} />;
+          } else if (route.name === "Message") {
+            iconName = focused ? "message-text" : "message-text-outline";
+            return <MaterialCommunityIcons name={iconName} size={size} color={color} />
           }
-          return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#003366",
         tabBarInactiveTintColor: "gray",
@@ -49,7 +52,7 @@ function MyTab() {
     >
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="History" component={History} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Message" component={Message} />
     </Tab.Navigator>
   );
 }
@@ -124,6 +127,16 @@ const ContainerNavigation = () => {
           <Stack.Screen
             name="Topup"
             component={Topup}
+            options={{
+              headerMode: "screen",
+              headerTitle: "",
+              headerStatusBarHeight: -10,
+              headerTintColor: "#FFFFFF",
+            }}
+          />
+          <Stack.Screen
+            name="Profile"
+            component={Profile}
             options={{
               headerMode: "screen",
               headerTitle: "",

@@ -1,7 +1,15 @@
 import { useState, useEffect, useContext } from "react";
 import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, View, Text, Image, TouchableOpacity, Pressable } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Pressable,
+} from "react-native";
 
 import { PATH_FILE } from "@env";
 import { GetUser } from "./Common/Hooks/getUser";
@@ -13,7 +21,11 @@ function DisplayProfile({ navigation }) {
   const { user } = GetUser();
 
   const [newURLPhoto, setNewURLPhoto] = useState();
-  const [showLogout, setShowLogout] = useState(false);
+  const [contentNavigation, setShowContentNavigation] = useState(false);
+
+  const toggleContentNavigation = () => {
+    setShowContentNavigation(!contentNavigation);
+  };
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("token");
@@ -44,7 +56,7 @@ function DisplayProfile({ navigation }) {
       <Text style={styles.textProfile}>Hi {user?.username}</Text>
       <Pressable
         style={styles.contentPhoto}
-        onPress={() => setShowLogout(!showLogout)}
+        onPress={() => setShowContentNavigation(!contentNavigation)}
       >
         {newURLPhoto?.photo &&
         newURLPhoto?.photo !== `${PATH_FILE}/static/photo/null` ? (
@@ -60,12 +72,19 @@ function DisplayProfile({ navigation }) {
             alt="photo"
           />
         )}
-        {showLogout && (
-          <TouchableOpacity style={styles.btnLogout} onPress={handleLogout}>
-            <Text style={styles.textLogout}>
-              <FontAwesome name="sign-out" size={16} color="#000000" /> Logout
-            </Text>
-          </TouchableOpacity>
+        {contentNavigation && (
+          <View style={styles.contentNavigation}>
+            <TouchableOpacity onPress={() => {navigation.navigate("Profile"); toggleContentNavigation();}} style={styles.btnProfile}>
+              <Text style={styles.textBtn}>
+                <FontAwesome6 name="user-large" size={16} color="#000000" />  Profile
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {handleLogout(); toggleContentNavigation();}} style={styles.btnLogout}>
+              <Text style={styles.textBtn}>
+                <FontAwesome name="sign-out" size={16} color="#000000" />  Logout
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
       </Pressable>
     </View>
@@ -103,23 +122,30 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 50,
   },
-  btnLogout: {
-    width: 100,
+  contentNavigation: {
+    width: 150,
     position: "absolute",
     top: 55,
     right: 0,
-    padding: 5,
+    padding: 10,
     backgroundColor: "#FFFFFF",
-    borderRadius: 5,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: "#FFFFFF",
   },
-  textLogout: {
-    textAlign: "center",
+  btnProfile: {
+    width: "100%",
+    marginBottom: 10,
+  },
+  btnLogout: {
+    width: "100%",
+  },
+  textBtn: {
+    textAlign: "left",
     textAlignVertical: "center",
     fontSize: 14,
     color: "#000000",
-  }
+  },
 });
 
 export default DisplayProfile;

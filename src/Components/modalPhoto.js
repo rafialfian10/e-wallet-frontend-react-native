@@ -81,7 +81,6 @@ function ModalPhoto(props) {
         type: "image/jpeg",
         name: `${state?.user?.username}.jpg`,
       });
-      console.log("body form", formData._parts);
 
       const response = await API.patch(
         `/user/${state?.user?.id}`,
