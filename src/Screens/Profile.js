@@ -14,10 +14,8 @@ import {
 
 import ModalProfile from "../Components/modalProfile";
 import ModalPhoto from "../Components/modalPhoto";
-import { GetUser } from "../Components/Common/Hooks/getUser";
 import { PATH_FILE } from "@env";
-
-console.log(PATH_FILE);
+import { GetUser } from "../Components/Common/Hooks/getUser";
 
 const Profile = () => {
   const { user, isLoadingUser, refetchUser } = GetUser();

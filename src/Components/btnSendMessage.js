@@ -1,9 +1,10 @@
 import { useState } from "react";
-import * as ImagePicker from "expo-image-picker";
 import { Ionicons, MaterialIcons, EvilIcons } from "@expo/vector-icons";
 import { StyleSheet, View, TextInput, Pressable } from "react-native";
 
 import { API } from "../Config/Api";
+import HandleOpenGallery from "./handleOpenGallery";
+import HandleOpenCamera from "./handleOpenCamera";
 
 function BtnSendMessage({ state, refetchUser }) {
   const [form, setForm] = useState({
@@ -12,47 +13,6 @@ function BtnSendMessage({ state, refetchUser }) {
     recipientId: "2dd351cd-51eb-4113-a707-dc496e55c5ee",
   });
 
-  const handleOpenGallery = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      // solve: Key "cancelled" in the image picker result is deprecated, use "canceled" instead,
-      delete result.cancelled;
-
-      if (!result.canceled) {
-        await handleSendMessage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.log("file failed to select", error);
-    }
-  };
-
-  const handleOpenCamera = async () => {
-    try {
-      await ImagePicker.requestCameraPermissionsAsync();
-      let result = await ImagePicker.launchCameraAsync({
-        cameraType: ImagePicker.CameraType.front,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      // solve: Key "cancelled" in the image picker result is deprecated, use "canceled" instead,
-      delete result.cancelled;
-
-      if (!result.canceled) {
-        await handleSendMessage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.log("camera error", error);
-    }
-  };
-
   const handleChange = (data, value) => {
     setForm({
       ...form,
@@ -60,7 +20,7 @@ function BtnSendMessage({ state, refetchUser }) {
     });
   };
 
-  const handleSendMessage = async (result) => {
+  const handleSendMessage = async () => {
     try {
       const config = {
         headers: {
@@ -70,21 +30,26 @@ function BtnSendMessage({ state, refetchUser }) {
       };
 
       const formData = new FormData();
-      formData.append("message", form.message);
-      formData.append("file", {
-        uri: result,
-        type: "image/jpeg",
-        name: `${state?.user?.username}.jpg`,
-      });
+      if (form.message != "") {
+        formData.append("message", form.message);
+      }
+      if (form.file !== "") {
+        formData.append("file", {
+          uri: form.file,
+          type: "image/jpeg",
+          name: `${state?.user?.username}.jpg`,
+        });
+      }
       formData.append("recipientId", form.recipientId);
 
       const response = await API.post(`/chat`, formData, config);
       if (response?.data?.status === 200) {
+        alert("OK");
         refetchUser();
         setForm({
           message: "",
           file: "",
-          recipientId: "",
+          recipientId: "2dd351cd-51eb-4113-a707-dc496e55c5ee",
         });
       }
     } catch (error) {
@@ -106,7 +71,7 @@ function BtnSendMessage({ state, refetchUser }) {
             name="attach-file"
             size={22}
             color="#808080"
-            onPress={handleOpenGallery}
+            onPress={() => HandleOpenGallery({ form, setForm })}
           />
         </Pressable>
         {form.message !== "" ? (
@@ -117,7 +82,7 @@ function BtnSendMessage({ state, refetchUser }) {
               name="camera"
               size={28}
               color="#808080"
-              onPress={handleOpenCamera}
+              onPress={() => HandleOpenCamera({ form, setForm })}
             />
           </Pressable>
         )}
