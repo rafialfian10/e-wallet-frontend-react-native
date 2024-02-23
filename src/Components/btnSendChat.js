@@ -2,15 +2,13 @@ import { useState } from "react";
 import { Ionicons, MaterialIcons, EvilIcons } from "@expo/vector-icons";
 import { StyleSheet, View, TextInput, Pressable } from "react-native";
 
-import { API } from "../Config/Api";
 import HandleOpenGallery from "./handleOpenGallery";
 import HandleOpenCamera from "./handleOpenCamera";
 
-function BtnSendMessage({ state, refetchUser }) {
+function BtnSendChat({ onSendMessage }) {
   const [form, setForm] = useState({
     message: "",
     file: "",
-    recipientId: "2dd351cd-51eb-4113-a707-dc496e55c5ee",
   });
 
   const handleChange = (data, value) => {
@@ -20,48 +18,21 @@ function BtnSendMessage({ state, refetchUser }) {
     });
   };
 
-  const handleSendMessage = async () => {
-    try {
-      const config = {
-        headers: {
-          "Content-type": "multipart/form-data",
-          Authorization: "Bearer " + state?.user?.token,
-        },
-      };
-
-      const formData = new FormData();
-      if (form.message != "") {
-        formData.append("message", form.message);
-      }
-      if (form.file !== "") {
-        formData.append("file", {
-          uri: form.file,
-          type: "image/jpeg",
-          name: `${state?.user?.username}.jpg`,
-        });
-      }
-      formData.append("recipientId", form.recipientId);
-
-      const response = await API.post(`/chat`, formData, config);
-      if (response?.data?.status === 200) {
-        alert("OK");
-        refetchUser();
-        setForm({
-          message: "",
-          file: "",
-          recipientId: "2dd351cd-51eb-4113-a707-dc496e55c5ee",
-        });
-      }
-    } catch (error) {
-      console.log(error);
+  const handleSendMessage = () => {
+    if (form.message.trim() !== "" || form.file.trim() !== "") {
+      onSendMessage(form);
+      setForm({
+        message: "",
+        file: "",
+      });
     }
   };
 
   return (
-    <View style={styles.contentBtnMessage}>
+    <View style={styles.contentBtnChat}>
       <TextInput
         placeholder="Type a message"
-        style={styles.inputMessage}
+        style={styles.inputChat}
         onChangeText={(value) => handleChange("message", value)}
         value={form.message}
       />
@@ -95,7 +66,7 @@ function BtnSendMessage({ state, refetchUser }) {
 }
 
 const styles = StyleSheet.create({
-  contentBtnMessage: {
+  contentBtnChat: {
     width: "95%",
     position: "relative",
     bottom: 0,
@@ -109,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
     zIndex: 10,
   },
-  inputMessage: {
+  inputChat: {
     width: "85%",
     height: 50,
     paddingLeft: 10,
@@ -143,4 +114,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BtnSendMessage;
+export default BtnSendChat;

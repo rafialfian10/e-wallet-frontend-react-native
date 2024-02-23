@@ -1,34 +1,22 @@
-import { useEffect, useState } from "react";
 import { Ionicons, Fontisto } from "@expo/vector-icons";
-import { StyleSheet, View, Text, Pressable, Image } from "react-native";
+import { StyleSheet, View, Text, Pressable, Image, TouchableOpacity } from "react-native";
 
 import { PATH_FILE } from "@env";
 
-function DisplayProfileMessage({ user }) {
-  const [newURLPhoto, setNewURLPhoto] = useState();
-
-  useEffect(() => {
-    if (user?.photo) {
-      const updatedPhotoURL = user?.photo.replace(
-        "http://localhost:5000",
-        PATH_FILE
-      );
-
-      setNewURLPhoto((prevForm) => ({
-        ...prevForm,
-        photo: updatedPhotoURL,
-      }));
-    }
-  }, [user]);
+function DisplayProfileChat({ adminContact, setShowChat }) {
+  const handleHideChat = () => {
+    setShowChat(false);
+  };
 
   return (
-    <View style={styles.contentProfile}>
-      <Ionicons name="arrow-back-outline" size={24} color="#000000" />
+    <View style={styles.contentProfileChat}>
+      <TouchableOpacity onPress={handleHideChat}> 
+        <Ionicons name="arrow-back-outline" size={24} color="#000000" />
+      </TouchableOpacity>
       <Pressable style={styles.contentPhoto}>
-        {newURLPhoto?.photo &&
-        newURLPhoto?.photo !== `${PATH_FILE}/static/photo/null` ? (
+        {adminContact?.photo && adminContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
           <Image
-            source={{ uri: newURLPhoto?.photo }}
+            source={{ uri: adminContact?.photo }}
             style={styles.photo}
             alt="photo"
           />
@@ -41,7 +29,7 @@ function DisplayProfileMessage({ user }) {
         )}
       </Pressable>
       <View style={styles.contentUsername}>
-        <Text style={styles.textUsername}>Admin</Text>
+        <Text style={styles.textUsername}>{adminContact?.username}</Text>
         <View style={styles.contentOnline}>
           <Fontisto name="ellipse" size={8} color="#228B22" />
           <Text style={styles.textOnline}>Online</Text>
@@ -55,7 +43,7 @@ function DisplayProfileMessage({ user }) {
 }
 
 const styles = StyleSheet.create({
-  contentProfile: {
+  contentProfileChat: {
     width: "100%",
     paddingHorizontal: 5,
     paddingVertical: 10,
@@ -99,4 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DisplayProfileMessage;
+export default DisplayProfileChat;

@@ -14,8 +14,8 @@ import Home from "./Home";
 import History from "./History";
 import Transfer from "./Transfer";
 import Topup from "./Topup";
-import Message from "./Message";
 import Profile from "./Profile";
+import Message from "./Message";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();

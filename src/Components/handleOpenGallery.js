@@ -10,13 +10,15 @@ async function HandleOpenGallery({ form, setForm }) {
     });
 
     delete result.cancelled;
-    
+
     if (!result.canceled) {
-        const imageUri = result.assets[0].uri;
-        setForm({
-          ...form, file: imageUri
-        })
-      } 
+      const imageUri = result.assets[0].uri;
+
+      setForm({
+        ...form,
+        file: imageUri,
+      });
+    }
   } catch (error) {
     console.log("file failed to select", error);
   }
