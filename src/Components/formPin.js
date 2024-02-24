@@ -1,13 +1,14 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { OtpInput } from "react-native-otp-entry";
 import { StyleSheet, View, Text, Keyboard } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { UserContext } from "../Context/UserContext";
+import { GetTransactionsUser } from "./Common/Hooks/getTransactionsUser";
 import { API } from "../Config/Api";
 
 function FormPin(props) {
   const {
+    user,
     refetchUser,
     form,
     setForm,
@@ -17,8 +18,7 @@ function FormPin(props) {
     setDataTransactionSuccess,
   } = props;
 
-  const [state, dispatch] = useContext(UserContext);
-  const pin = state?.user?.pin;
+  const { refetchTransactionsUser } = GetTransactionsUser(1);
 
   const [pinCompleted, setPinCompleted] = useState(false);
 
@@ -42,7 +42,8 @@ function FormPin(props) {
       };
 
       const messageError = {
-        pin: form.pin != pin ? "PIN does not match, please try again" : "",
+        pin:
+          form.pin != user?.pin ? "PIN does not match, please try again" : "",
       };
 
       if (!messageError.pin) {
@@ -53,10 +54,11 @@ function FormPin(props) {
           otherUserId: form.otherUserId,
         });
 
-        if(form.transactionType === "transfer") {
+        if (form.transactionType === "transfer") {
           const response = await API.post("/transfer", body, config);
           if (response.data.status === 200) {
             refetchUser();
+            refetchTransactionsUser();
             setForm({ amount: "", pin: "", otherUserId: "" });
             setError({ amount: "", pin: "", otherUserId: "" });
             setDataTransactionSuccess({ visible: true, data: form });
@@ -66,6 +68,7 @@ function FormPin(props) {
           const response = await API.post("/topup", body, config);
           if (response.data.status === 200) {
             refetchUser();
+            refetchTransactionsUser();
             setForm({ amount: "", pin: "", otherUserId: "" });
             setError({ amount: "", pin: "", otherUserId: "" });
             setDataTransactionSuccess({ visible: true, data: form });

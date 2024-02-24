@@ -2,7 +2,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
-function DisplayChat({ state, adminContact, messages }) {
+function DisplayChat({ state, userContact, adminContact, messages }) {
   const handleDownloadFile = (file) => {
     try {
       console.log(file);
@@ -27,7 +27,7 @@ function DisplayChat({ state, adminContact, messages }) {
 
   return (
     <View style={styles.contentChat}>
-      {adminContact ? (
+      {userContact || adminContact ? (
         messages?.map((item, i) => (
           <View
             key={i}
@@ -52,7 +52,7 @@ function DisplayChat({ state, adminContact, messages }) {
               },
             ]}
           >
-            {(item?.file !== ""  ) ? (
+            {(item?.file !== "") ? (
               <View style={styles.contentDownloadFile}>
                 <TouchableOpacity
                   onPress={() => handleDownloadFile(item?.file)}
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
   contentChat: {
     width: "100%",
     marginTop: 10,
+    marginBottom: 60,
     padding: 10,
   },
   subContentChat: {

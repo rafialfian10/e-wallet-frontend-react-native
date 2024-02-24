@@ -61,7 +61,9 @@ const History = () => {
     []
   );
 
-  useEffect(() => getData(), []);
+  useEffect(() => {
+    getData();
+  }, [page]);
 
   return (
     <SafeAreaView style={styles.containerHistory}>

@@ -1,15 +1,15 @@
-import { StyleSheet, SafeAreaView, ScrollView } from "react-native";
+import { StyleSheet, View, ScrollView } from "react-native";
 
 import DisplayProfileChat from "./displayProfileChat";
 import BtnSendChat from "./btnSendChat";
 import DisplayChat from "./displayChat";
 
-function Chat({ state, adminContact, messages,setShowChat }) {
+function Chat({ state, userContact, adminContact, messages, setShowChat }) {
   const onSendMessage = (form) => {
     const data = {
       message: form.message,
       file: form.file,
-      recipientId: adminContact.id,
+      recipientId: userContact?.id || adminContact?.id,
     };
 
     // emit event for send message
@@ -17,17 +17,22 @@ function Chat({ state, adminContact, messages,setShowChat }) {
   };
 
   return (
-    <SafeAreaView style={styles.containerChat}>
-      <DisplayProfileChat adminContact={adminContact} setShowChat={setShowChat} />
+    <View style={styles.containerChat}>
+      <DisplayProfileChat
+        userContact={userContact}
+        adminContact={adminContact}
+        setShowChat={setShowChat}
+      />
       <ScrollView>
         <DisplayChat
           state={state}
+          userContact={userContact}
           adminContact={adminContact}
           messages={messages}
         />
       </ScrollView>
       <BtnSendChat onSendMessage={onSendMessage} />
-    </SafeAreaView>
+    </View>
   );
 }
 

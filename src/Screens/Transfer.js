@@ -15,7 +15,7 @@ import ModalTransferSuccess from "../Components/modalTransactionSuccess";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
 const Transfer = ({ navigation }) => {
-  const { refetchUser } = GetUser();
+  const { user, refetchUser } = GetUser();
 
   const [activeButton, setActiveButton] = useState({ active: null });
   const [modalTransferSuccess, setModalTransferSuccess] = useState(false);
@@ -72,6 +72,7 @@ const Transfer = ({ navigation }) => {
   return showPinForm ? (
     <SafeAreaView style={styles.containerTransfer}>
       <FormPin
+        user={user}
         refetchUser={refetchUser}
         form={form}
         setForm={setForm}

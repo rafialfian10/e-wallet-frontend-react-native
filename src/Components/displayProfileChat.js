@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Pressable, Image, TouchableOpacity } from "reac
 
 import { PATH_FILE } from "@env";
 
-function DisplayProfileChat({ adminContact, setShowChat }) {
+function DisplayProfileChat({ userContact, adminContact, setShowChat }) {
   const handleHideChat = () => {
     setShowChat(false);
   };
@@ -14,9 +14,9 @@ function DisplayProfileChat({ adminContact, setShowChat }) {
         <Ionicons name="arrow-back-outline" size={24} color="#000000" />
       </TouchableOpacity>
       <Pressable style={styles.contentPhoto}>
-        {adminContact?.photo && adminContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
+        {userContact?.photo && userContact?.photo !== `${PATH_FILE}/static/photo/null` || adminContact?.photo && adminContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
           <Image
-            source={{ uri: adminContact?.photo }}
+            source={{ uri: userContact?.photo || adminContact?.photo }}
             style={styles.photo}
             alt="photo"
           />
@@ -29,7 +29,7 @@ function DisplayProfileChat({ adminContact, setShowChat }) {
         )}
       </Pressable>
       <View style={styles.contentUsername}>
-        <Text style={styles.textUsername}>{adminContact?.username}</Text>
+        <Text style={styles.textUsername}>{userContact?.username || adminContact?.username}</Text>
         <View style={styles.contentOnline}>
           <Fontisto name="ellipse" size={8} color="#228B22" />
           <Text style={styles.textOnline}>Online</Text>

@@ -68,7 +68,7 @@ function BtnSendChat({ onSendMessage }) {
 const styles = StyleSheet.create({
   contentBtnChat: {
     width: "95%",
-    position: "relative",
+    position: "absolute",
     bottom: 0,
     paddingBottom: 5,
     display: "flex",

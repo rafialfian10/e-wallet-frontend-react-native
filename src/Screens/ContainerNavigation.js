@@ -103,7 +103,7 @@ const ContainerNavigation = () => {
   useEffect(() => {
     checkLogin();
     isAsyncTokenExist();
-  }, []);
+  }, [state.isLogin]);
 
   return (
     <>
