@@ -34,7 +34,7 @@ function DisplayProfile({ navigation }) {
       payload: {},
     });
     navigation.navigate("Index");
-    window.location.reload();
+    // window.location.reload();
     alert("Logout successfully");
   };
 

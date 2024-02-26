@@ -8,9 +8,15 @@ function Chat({ state, userContact, adminContact, messages, setShowChat }) {
   const onSendMessage = (form) => {
     const data = {
       message: form.message,
-      file: form.file,
+      file: {
+        uri: form.file,
+        type: "image/jpeg",
+        name: `${state?.user?.username}.jpg`,
+      },
       recipientId: userContact?.id || adminContact?.id,
     };
+
+    console.log("qqqqqqqqqqq",data);
 
     // emit event for send message
     socket.emit("send message", data);
