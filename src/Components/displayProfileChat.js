@@ -6,6 +6,7 @@ import {
   Pressable,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
 import { PATH_FILE } from "@env";
@@ -15,14 +16,33 @@ function DisplayProfileChat({
   adminContact,
   setShowChat,
   holdIndexes,
+  setHoldIndexes,
 }) {
   const handleHideChat = () => {
     setShowChat(false);
   };
-  
+
   const onDeleteMessage = () => {
-    // emit event for delete messages
-    socket.emit("delete messages", holdIndexes);
+    Alert.alert(
+      "",
+      `delete ${holdIndexes.length} message?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: () => {
+            // emit event for delete messages
+            socket.emit("delete messages", holdIndexes);
+            setHoldIndexes([])
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -63,7 +83,9 @@ function DisplayProfileChat({
             <FontAwesome name="trash-o" size={24} color="black" />
           </TouchableOpacity>
         )}
-        <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000000" />
+        <TouchableOpacity>
+          <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000000" />
+        </TouchableOpacity>
       </Pressable>
     </View>
   );
@@ -113,7 +135,7 @@ const styles = StyleSheet.create({
     right: 10,
     display: "flex",
     flexDirection: "row",
-    gap: 10,
+    gap: 20,
   },
 });
 

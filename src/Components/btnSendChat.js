@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Ionicons, MaterialIcons, EvilIcons } from "@expo/vector-icons";
 import { StyleSheet, View, TextInput, Pressable } from "react-native";
 
-import HandleOpenGallery from "./handleOpenGallery";
+import HandleOpenDocument from "./handleOpenDocument";
 import HandleOpenCamera from "./handleOpenCamera";
 
 function BtnSendChat({ onSendMessage }) {
@@ -19,7 +19,7 @@ function BtnSendChat({ onSendMessage }) {
   };
 
   const handleSendMessage = () => {
-    if (form.message.trim() !== "" || form.file.trim() !== "") {
+    if (form.message !== "" || form.file !== "") {
       onSendMessage(form);
       setForm({
         message: "",
@@ -42,7 +42,7 @@ function BtnSendChat({ onSendMessage }) {
             name="attach-file"
             size={22}
             color="#808080"
-            onPress={() => HandleOpenGallery({ form, setForm })}
+            onPress={() => HandleOpenDocument({ form, setForm })}
           />
         </Pressable>
         {form.message !== "" ? (

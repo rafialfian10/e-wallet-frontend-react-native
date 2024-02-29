@@ -10,15 +10,9 @@ function Chat({ state, userContact, adminContact, messages, setShowChat }) {
   const [holdIndexes, setHoldIndexes] = useState([]);
 
   const onSendMessage = (form) => {
-    let fileForm = form.file !== "" ? {
-      uri: form.file,
-      type: "image/jpeg",
-      name: `${state?.user?.username}.jpg`,
-    } : "";
-
     const data = {
       message: form.message,
-      file: fileForm,
+      file: form.file,
       recipientId: userContact?.id || adminContact?.id,
     };
 
@@ -33,6 +27,7 @@ function Chat({ state, userContact, adminContact, messages, setShowChat }) {
         adminContact={adminContact}
         setShowChat={setShowChat}
         holdIndexes={holdIndexes}
+        setHoldIndexes={setHoldIndexes}
       />
       <ScrollView>
         <DisplayChat
