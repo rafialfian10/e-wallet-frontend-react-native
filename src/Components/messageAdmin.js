@@ -5,7 +5,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chats";
-import { SOCKET_URL } from "@env";
+import { SOCKET_SERVER } from "@env";
 import { UserContext } from "../Context/UserContext";
 
 function MessageAdmin({ showChat, setShowChat }) {
@@ -16,7 +16,7 @@ function MessageAdmin({ showChat, setShowChat }) {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    socket = io(SOCKET_URL, {
+    socket = io(SOCKET_SERVER, {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -25,16 +25,16 @@ function MessageAdmin({ showChat, setShowChat }) {
       },
     });
 
-    socket.on("connect", () => {
-      loadUsersContact();
-      loadMessages();
-    });
-
     // define corresponding socket listener
     socket.on("new message", () => {
       console.log("contact", userContact);
       console.log("triggered", userContact?.id);
       socket.emit("load messages", userContact?.id);
+    });
+
+    socket.on("connect", () => {
+      loadUsersContact();
+      loadMessages();
     });
 
     // listen error sent from server
@@ -45,7 +45,7 @@ function MessageAdmin({ showChat, setShowChat }) {
     return () => {
       socket.disconnect();
     };
-  }, [messages]);
+  }, [messages, userContact?.id]);
 
   const loadUsersContact = () => {
     socket.emit("load users contact");
@@ -62,9 +62,11 @@ function MessageAdmin({ showChat, setShowChat }) {
       // manipulate customers to add message property with the newest message
       dataUsersContact = dataUsersContact.map((item) => {
         const allMessages = [...item.senderMessage, ...item.recipientMessage];
-        
+
         // sort by createAt
-        allMessages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        allMessages.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
 
         return {
           ...item,
@@ -91,9 +93,10 @@ function MessageAdmin({ showChat, setShowChat }) {
     socket.on("messages", (data) => {
       if (data.length > 0) {
         const dataMessages = data.map((item) => ({
+          id: item?.id,
           senderId: item?.sender.id,
           message: item?.message,
-          file: item?.file
+          file: item?.file,
         }));
         setMessages(dataMessages);
       }

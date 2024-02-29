@@ -5,7 +5,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chats";
-import { SOCKET_URL } from "@env";
+import { SOCKET_SERVER } from "@env";
 import { UserContext } from "../Context/UserContext";
 
 function MessageUser({ showChat, setShowChat }) {
@@ -15,7 +15,7 @@ function MessageUser({ showChat, setShowChat }) {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    socket = io(SOCKET_URL, {
+    socket = io(SOCKET_SERVER, {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -24,16 +24,16 @@ function MessageUser({ showChat, setShowChat }) {
       },
     });
 
-    socket.on("connect", () => {
-      loadAdminContact();
-      loadMessages();
-    });
-
     // define corresponding socket listener
     socket.on("new message", () => {
       console.log("contact", adminContact);
       console.log("triggered", adminContact?.id);
       socket.emit("load messages", adminContact?.id);
+    });
+
+    socket.on("connect", () => {
+      loadAdminContact();
+      loadMessages();
     });
 
     // listen error sent from server
@@ -44,7 +44,7 @@ function MessageUser({ showChat, setShowChat }) {
     return () => {
       socket.disconnect();
     };
-  }, [messages]);
+  }, [messages, adminContact?.id]);
 
   const loadAdminContact = () => {
     // emit corresponding event to load admin contact
@@ -72,6 +72,7 @@ function MessageUser({ showChat, setShowChat }) {
     socket.on("messages", async (data) => {
       if (data?.length > 0) {
         const dataMessages = data?.map((item) => ({
+          id: item?.id,
           senderId: item?.sender.id,
           message: item?.message,
           file: item?.file,
@@ -86,6 +87,18 @@ function MessageUser({ showChat, setShowChat }) {
       loadMessages(adminContact?.id);
     }
   }, [adminContact?.id]);
+
+  useEffect(() => {
+    socket.on("messages deleted", (deletedIds) => {
+      // Filter out the deleted messages from the current messages state
+      const updatedMessages = messages.filter(message => !deletedIds.includes(message.id));
+      setMessages(updatedMessages);
+    });
+
+    return () => {
+      socket.off("messages deleted");
+    };
+  }, [messages]);
 
   return !showChat ? (
     <ScrollView>

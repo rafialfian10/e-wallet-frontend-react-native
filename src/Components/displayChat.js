@@ -2,7 +2,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
-function DisplayChat({ state, userContact, adminContact, messages }) {
+function DisplayChat({ state, userContact, adminContact, messages, holdIndexes, setHoldIndexes }) {
   const handleDownloadFile = (file) => {
     try {
       console.log(file);
@@ -25,11 +25,23 @@ function DisplayChat({ state, userContact, adminContact, messages }) {
     }
   };
 
+  const handleHold = (index) => {
+    if (holdIndexes.includes(index)) {
+      setHoldIndexes(holdIndexes.filter((i) => i !== index));
+    } else {
+      setHoldIndexes([...holdIndexes, index]);
+    }
+  };
+
+  const handleClick = (index) => {
+    setHoldIndexes(holdIndexes.filter((i) => i !== index));
+  };
+
   return (
     <View style={styles.contentChat}>
       {userContact || adminContact ? (
         messages?.map((item, i) => (
-          <View
+          <TouchableOpacity
             key={i}
             style={[
               styles.subContentChat,
@@ -50,13 +62,18 @@ function DisplayChat({ state, userContact, adminContact, messages }) {
               {
                 marginRight: item?.senderId === state?.user?.id ? 0 : 20,
               },
+              {
+                opacity: holdIndexes.includes(item?.id) ? 0.5 : 1,
+              }
             ]}
+            onLongPress={() => handleHold(item?.id)}
+            onPress={() => handleClick(item?.id)}
           >
             {(item?.file !== "") ? (
               <View style={styles.contentDownloadFile}>
                 <TouchableOpacity
-                  onPress={() => handleDownloadFile(item?.file)}
                   style={styles.btnDownloadFile}
+                  onPress={() => handleDownloadFile(item?.file)}
                 >
                   <MaterialCommunityIcons
                     name="download"
@@ -74,7 +91,7 @@ function DisplayChat({ state, userContact, adminContact, messages }) {
               ""
             )}
             <Text style={styles.textMessage}>{item?.message}</Text>
-          </View>
+          </TouchableOpacity>
         ))
       ) : (
         <View style={styles.contentNoMessage}>

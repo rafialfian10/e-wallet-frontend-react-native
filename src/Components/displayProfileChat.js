@@ -1,20 +1,40 @@
-import { Ionicons, Fontisto } from "@expo/vector-icons";
-import { StyleSheet, View, Text, Pressable, Image, TouchableOpacity } from "react-native";
+import { Ionicons, FontAwesome, Fontisto } from "@expo/vector-icons";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 
 import { PATH_FILE } from "@env";
 
-function DisplayProfileChat({ userContact, adminContact, setShowChat }) {
+function DisplayProfileChat({
+  userContact,
+  adminContact,
+  setShowChat,
+  holdIndexes,
+}) {
   const handleHideChat = () => {
     setShowChat(false);
+  };
+  
+  const onDeleteMessage = () => {
+    // emit event for delete messages
+    socket.emit("delete messages", holdIndexes);
   };
 
   return (
     <View style={styles.contentProfileChat}>
-      <TouchableOpacity onPress={handleHideChat}> 
+      <TouchableOpacity onPress={handleHideChat}>
         <Ionicons name="arrow-back-outline" size={24} color="#000000" />
       </TouchableOpacity>
       <Pressable style={styles.contentPhoto}>
-        {userContact?.photo && userContact?.photo !== `${PATH_FILE}/static/photo/null` || adminContact?.photo && adminContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
+        {(userContact?.photo &&
+          userContact?.photo !== `${PATH_FILE}/static/photo/null`) ||
+        (adminContact?.photo &&
+          adminContact?.photo !== `${PATH_FILE}/static/photo/null`) ? (
           <Image
             source={{ uri: userContact?.photo || adminContact?.photo }}
             style={styles.photo}
@@ -29,13 +49,20 @@ function DisplayProfileChat({ userContact, adminContact, setShowChat }) {
         )}
       </Pressable>
       <View style={styles.contentUsername}>
-        <Text style={styles.textUsername}>{userContact?.username || adminContact?.username}</Text>
+        <Text style={styles.textUsername}>
+          {userContact?.username || adminContact?.username}
+        </Text>
         <View style={styles.contentOnline}>
           <Fontisto name="ellipse" size={8} color="#228B22" />
           <Text style={styles.textOnline}>Online</Text>
         </View>
       </View>
-      <Pressable style={styles.ellipsis}>
+      <Pressable style={styles.contanetTrashEllipsis}>
+        {holdIndexes.length > 0 && (
+          <TouchableOpacity onPress={onDeleteMessage}>
+            <FontAwesome name="trash-o" size={24} color="black" />
+          </TouchableOpacity>
+        )}
         <Ionicons name="ellipsis-vertical-sharp" size={24} color="#000000" />
       </Pressable>
     </View>
@@ -81,9 +108,12 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "#000000",
   },
-  ellipsis: {
+  contanetTrashEllipsis: {
     position: "absolute",
     right: 10,
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
   },
 });
 
