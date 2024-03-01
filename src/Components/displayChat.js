@@ -69,7 +69,7 @@ function DisplayChat({ state, userContact, adminContact, messages, holdIndexes, 
             onLongPress={() => handleHold(item?.id)}
             onPress={() => handleClick(item?.id)}
           >
-            {(item?.file !== "") ? (
+            {(item?.file !== null) ? (
               <View style={styles.contentDownloadFile}>
                 <TouchableOpacity
                   style={styles.btnDownloadFile}

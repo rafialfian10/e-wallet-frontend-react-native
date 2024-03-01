@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
+import SocketIOFileUpload from "socketio-file-upload";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -13,6 +14,7 @@ function MessageUser({ showChat, setShowChat }) {
 
   const [adminContact, setAdminContact] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [siofu, setSiofu] = useState();
 
   useEffect(() => {
     socket = io(SOCKET_SERVER, {
@@ -23,6 +25,9 @@ function MessageUser({ showChat, setShowChat }) {
         id: state.user.id,
       },
     });
+
+    let siofuInstance = new SocketIOFileUpload(socket);
+    setSiofu(siofuInstance);
 
     // define corresponding socket listener
     socket.on("new message", () => {
@@ -118,6 +123,7 @@ function MessageUser({ showChat, setShowChat }) {
       adminContact={adminContact}
       messages={messages}
       setShowChat={setShowChat}
+      siofu={siofu}
     />
   );
 }

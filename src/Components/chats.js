@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { io } from "socket.io-client";
 import { StyleSheet, View, ScrollView } from "react-native";
 
 import DisplayProfileChat from "./displayProfileChat";
 import BtnSendChat from "./btnSendChat";
 import DisplayChat from "./displayChat";
 
-function Chat({ state, userContact, adminContact, messages, setShowChat }) {
+function Chat({ state, userContact, adminContact, messages, setShowChat, siofu }) {
   const [holdIndexes, setHoldIndexes] = useState([]);
 
   const onSendMessage = (form) => {
