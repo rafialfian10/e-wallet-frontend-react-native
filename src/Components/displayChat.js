@@ -2,7 +2,14 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 
-function DisplayChat({ state, userContact, adminContact, messages, holdIndexes, setHoldIndexes }) {
+function DisplayChat({
+  state,
+  userContact,
+  adminContact,
+  messages,
+  holdIndexes,
+  setHoldIndexes,
+}) {
   const handleDownloadFile = (file) => {
     try {
       console.log(file);
@@ -47,7 +54,9 @@ function DisplayChat({ state, userContact, adminContact, messages, holdIndexes, 
               styles.subContentChat,
               {
                 alignSelf:
-                  item?.senderId === state?.user?.id ? "flex-end" : "flex-start",
+                  item?.senderId === state?.user?.id
+                    ? "flex-end"
+                    : "flex-start",
               },
               {
                 backgroundColor:
@@ -64,33 +73,37 @@ function DisplayChat({ state, userContact, adminContact, messages, holdIndexes, 
               },
               {
                 opacity: holdIndexes.includes(item?.id) ? 0.5 : 1,
-              }
+              },
             ]}
             onLongPress={() => handleHold(item?.id)}
             onPress={() => handleClick(item?.id)}
           >
-            {(item?.file !== null) ? (
-              <View style={styles.contentDownloadFile}>
-                <TouchableOpacity
-                  style={styles.btnDownloadFile}
-                  onPress={() => handleDownloadFile(item?.file)}
-                >
-                  <MaterialCommunityIcons
-                    name="download"
-                    size={20}
-                    color="#000000"
-                  />
-                </TouchableOpacity>
-                <Text style={styles.textFile}>
-                  {item?.file?.length > 20
-                    ? item?.file.slice(0, 20) + "..."
-                    : item?.file}
-                </Text>
-              </View>
+            {item?.files !== null
+              ? item.files.map((file, i) => (
+                  <View key={i} style={styles.contentDownloadFile}>
+                    <TouchableOpacity
+                      style={styles.btnDownloadFile}
+                      onPress={() => handleDownloadFile(file?.file)}
+                    >
+                      <MaterialCommunityIcons
+                        name="download"
+                        size={20}
+                        color="#000000"
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.textFile}>
+                      {file?.file?.length > 30
+                        ? file?.file.slice(0, 30) + "..."
+                        : file?.file}
+                    </Text>
+                  </View>
+                ))
+              : ""}
+            {item?.message !== "" ? (
+              <Text style={styles.textMessage}>{item?.message}</Text>
             ) : (
               ""
             )}
-            <Text style={styles.textMessage}>{item?.message}</Text>
           </TouchableOpacity>
         ))
       ) : (
@@ -115,6 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   contentDownloadFile: {
+    marginBottom: 5,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",

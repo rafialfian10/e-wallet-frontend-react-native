@@ -3,17 +3,23 @@ import * as DocumentPicker from "expo-document-picker";
 async function HandleOpenDocument({ form, setForm }) {
   try {
     let result = await DocumentPicker.getDocumentAsync({
-      // multiple: true,
+      multiple: true,
     });
 
     delete result.cancelled;
 
     if (!result.canceled) {
-      const fileUri = result.assets[0];
+      // const fileUri = result.assets;
+      const files = result.assets.map(asset => ({
+        uri: asset.uri,
+        name: asset.name,
+        mimeType: asset.mimeType,
+        size: asset.size,
+      }));
 
       setForm({
         ...form,
-        file: fileUri,
+        files: [...form.files, ...files],
       });
     }
 

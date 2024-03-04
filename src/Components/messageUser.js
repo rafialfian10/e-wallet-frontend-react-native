@@ -80,7 +80,7 @@ function MessageUser({ showChat, setShowChat }) {
           id: item?.id,
           senderId: item?.sender.id,
           message: item?.message,
-          file: item?.file,
+          files: item?.files,
         }));
         setMessages(dataMessages);
       }

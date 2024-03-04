@@ -5,13 +5,26 @@ import DisplayProfileChat from "./displayProfileChat";
 import BtnSendChat from "./btnSendChat";
 import DisplayChat from "./displayChat";
 
-function Chat({ state, userContact, adminContact, messages, setShowChat, siofu }) {
+function Chat({
+  state,
+  userContact,
+  adminContact,
+  messages,
+  setShowChat,
+  siofu,
+}) {
   const [holdIndexes, setHoldIndexes] = useState([]);
 
   const onSendMessage = (form) => {
+    const dataFiles = form.files.map((file) => ({
+      uri: file.uri,
+      name: file.name,
+      type: file.mimeType,
+    }));
+
     const data = {
       message: form.message,
-      file: form.file,
+      files: dataFiles,
       recipientId: userContact?.id || adminContact?.id,
     };
 
@@ -38,7 +51,11 @@ function Chat({ state, userContact, adminContact, messages, setShowChat, siofu }
           setHoldIndexes={setHoldIndexes}
         />
       </ScrollView>
-      <BtnSendChat onSendMessage={onSendMessage} />
+      <BtnSendChat
+        userContact={userContact}
+        adminContact={adminContact}
+        onSendMessage={onSendMessage}
+      />
     </View>
   );
 }

@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Ionicons, MaterialIcons, EvilIcons } from "@expo/vector-icons";
 import { StyleSheet, View, TextInput, Pressable } from "react-native";
 
 import HandleOpenDocument from "./handleOpenDocument";
 import HandleOpenCamera from "./handleOpenCamera";
+// import { UserContext } from "../Context/UserContext";
+// import { API } from "../Config/Api";
 
-function BtnSendChat({ onSendMessage }) {
+function BtnSendChat({ userContact, adminContact, onSendMessage }) {
+  // const [state, dispatch] = useContext(UserContext);
+
   const [form, setForm] = useState({
     message: "",
-    file: "",
+    files: [],
+    // recipientId: userContact?.id || adminContact?.id,
   });
 
   const handleChange = (data, value) => {
@@ -19,14 +24,48 @@ function BtnSendChat({ onSendMessage }) {
   };
 
   const handleSendMessage = () => {
-    if (form.message !== "" || form.file !== "") {
+    if (form.message !== "" || form.files.length !== 0) {
       onSendMessage(form);
       setForm({
         message: "",
-        file: "",
+        files: [],
       });
     }
   };
+
+  // const handleSendMessage = async () => {
+  //   try {
+  //     const config = {
+  //       headers: {
+  //         "Content-type": "multipart/form-data",
+  //         Authorization: "Bearer " + state?.user?.token,
+  //       },
+  //     };
+
+  //     const formData = new FormData();
+  //     formData.append("message", form.message || "");
+  //     formData.append("recipientId", form.recipientId);
+  //     form.files.map((file) => {
+  //       formData.append("files", {
+  //         uri: file.uri,
+  //         name: file.name,
+  //         type: file.mimeType,
+  //       });
+  //     });
+
+  //     const response = await API.post(`/chat`, formData, config);
+  //     if (response?.data?.status === 200) {
+  //       setForm({
+  //         message: "",
+  //         files: [],
+  //         recipientId: userContact?.id || adminContact?.id,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert("Failed to send message. Please check your network connection.");
+  //   }
+  // };
 
   return (
     <View style={styles.contentBtnChat}>
