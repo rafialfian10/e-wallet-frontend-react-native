@@ -11,6 +11,7 @@ import { UserContext } from "../Context/UserContext";
 function MessageAdmin({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);
 
+  const [userOnline, setUserOnline] = useState(false);
   const [usersContact, setUsersContact] = useState([]);
   const [userContact, setUserContact] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -37,6 +38,18 @@ function MessageAdmin({ showChat, setShowChat }) {
       loadMessages();
     });
 
+    socket.on("userOnline", (userId) => {
+      if (userId === userContact?.id) {
+        setUserOnline(true);
+      }
+    });
+
+    socket.on("userOffline", (userId) => {
+      if (userId === userContact?.id) {
+        setUserOnline(false);
+      }
+    });
+
     // listen error sent from server
     socket.on("connect_error", (err) => {
       console.error(err.message); // not authorized
@@ -45,18 +58,19 @@ function MessageAdmin({ showChat, setShowChat }) {
     return () => {
       socket.disconnect();
     };
-  }, [messages, userContact?.id]);
+
+  }, [messages]);
 
   const loadUsersContact = () => {
     socket.emit("load users contact");
 
     socket.on("users contact", (data) => {
       // filter just customers which have sent a message
-      let dataUsersContact = data.filter(
+      let dataUsersContact = data?.filter(
         (item) =>
-          item.role.id !== 1 &&
-          item.role.id !== 2 &&
-          (item.recipientMessage.length > 0 || item.senderMessage.length > 0)
+          item?.role.id !== 1 &&
+          item?.role.id !== 2 &&
+          (item?.recipientMessage.length > 0 || item?.senderMessage.length > 0)
       );
 
       // manipulate customers to add message property with the newest message
@@ -73,7 +87,11 @@ function MessageAdmin({ showChat, setShowChat }) {
           message:
             allMessages.length > 0
               ? allMessages[allMessages.length - 1].message
-              : "Klik di sini untuk memulai pesan",
+              : "Click here to start message",
+          createdAt:
+            allMessages.length > 0
+              ? allMessages[allMessages.length - 1].createdAt
+              : "",
         };
       });
       setUsersContact(dataUsersContact);
@@ -85,24 +103,38 @@ function MessageAdmin({ showChat, setShowChat }) {
     setUserContact(data);
 
     // emit event load messages
-    socket.emit("load messages", data.id);
+    socket.emit("load messages", data?.id);
   };
 
   const loadMessages = () => {
     // define listener on event "messages"
     socket.on("messages", (data) => {
-      if (data.length > 0) {
-        const dataMessages = data.map((item) => ({
+      if (data.length >= 0) {
+        const dataMessages = data?.map((item) => ({
           id: item?.id,
           senderId: item?.sender.id,
           message: item?.message,
-          file: item?.file,
+          files: item?.files,
         }));
         setMessages(dataMessages);
       }
       loadUsersContact();
     });
   };
+
+  useEffect(() => {
+    socket.on("messages deleted", (deletedIds) => {
+      // Filter out the deleted messages from the current messages state
+      const updatedMessages = messages.filter(
+        (message) => !deletedIds.includes(message.id)
+      );
+      setMessages(updatedMessages);
+    });
+
+    return () => {
+      socket.off("messages deleted");
+    };
+  }, [messages]);
 
   return !showChat ? (
     <ScrollView>
@@ -112,6 +144,7 @@ function MessageAdmin({ showChat, setShowChat }) {
           <DisplayMessage
             usersContact={usersContact}
             setShowChat={setShowChat}
+            messages={messages}
             onClickUserContact={onClickUserContact}
           />
         </View>
@@ -120,8 +153,10 @@ function MessageAdmin({ showChat, setShowChat }) {
   ) : (
     <Chat
       state={state}
+      userOnline={userOnline}
       userContact={userContact}
       messages={messages}
+      setMessages={setMessages}
       setShowChat={setShowChat}
     />
   );

@@ -13,10 +13,10 @@ async function HandleOpenCamera({ form, setForm }) {
     delete result.cancelled;
 
     if (!result.canceled) {
-      const imageUri = result.assets[0].uri;
+      const imageUri = result.assets;
       setForm({
         ...form,
-        file: imageUri,
+        files: imageUri,
       });
     }
   } catch (error) {

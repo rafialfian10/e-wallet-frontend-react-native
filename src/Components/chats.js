@@ -7,11 +7,13 @@ import DisplayChat from "./displayChat";
 
 function Chat({
   state,
+  userOnline,
   userContact,
+  adminOnline,
   adminContact,
   messages,
+  setMessages,
   setShowChat,
-  siofu,
 }) {
   const [holdIndexes, setHoldIndexes] = useState([]);
 
@@ -35,8 +37,11 @@ function Chat({
   return (
     <View style={styles.containerChat}>
       <DisplayProfileChat
+        userOnline={userOnline}
         userContact={userContact}
+        adminOnline={adminOnline}
         adminContact={adminContact}
+        setMessages={setMessages}
         setShowChat={setShowChat}
         holdIndexes={holdIndexes}
         setHoldIndexes={setHoldIndexes}

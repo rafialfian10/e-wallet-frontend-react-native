@@ -3,7 +3,15 @@ import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 
 import { PATH_FILE } from "@env";
 
-function DisplayMessage({ adminContact, usersContact, setShowChat, onClickUserContact }) {
+function DisplayMessage({
+  adminContact,
+  usersContact,
+  setShowChat,
+  onClickUserContact,
+  messages,
+}) {
+  const lastMessage = messages[messages.length - 1];
+
   const handleShowChat = () => {
     setShowChat(true);
   };
@@ -11,12 +19,14 @@ function DisplayMessage({ adminContact, usersContact, setShowChat, onClickUserCo
   return (
     <View style={styles.contentMessage}>
       {usersContact?.length > 0 ? (
-        usersContact.map((userContact, i) => (
+        usersContact?.map((userContact, i) => (
           <TouchableOpacity
             key={i}
             style={styles.contactContainer}
-            onPress={() => {handleShowChat(); onClickUserContact(userContact)}}
-           
+            onPress={() => {
+              handleShowChat();
+              onClickUserContact(userContact);
+            }}
           >
             <View style={styles.contentPhoto}>
               {userContact?.photo &&
@@ -37,7 +47,9 @@ function DisplayMessage({ adminContact, usersContact, setShowChat, onClickUserCo
             <View style={styles.contentDataUser}>
               <View style={styles.contentUsernameDate}>
                 <Text style={styles.username}>{userContact?.username}</Text>
-                <Text style={styles.date}>{moment(userContact?.createdAt).format('DD/MM/YY')}</Text>
+                <Text style={styles.date}>
+                  {userContact ? moment(userContact?.createdAt).format("DD/MM/YY") : ""}
+                </Text>
               </View>
               <Text style={styles.message}>{userContact?.message}</Text>
             </View>
@@ -64,8 +76,13 @@ function DisplayMessage({ adminContact, usersContact, setShowChat, onClickUserCo
               />
             )}
           </View>
-          <View style={styles.contentTextMessage}>
-            <Text style={styles.username}>{adminContact?.username}</Text>
+          <View style={styles.contentDataUser}>
+            <View style={styles.contentUsernameDate}>
+              <Text style={styles.username}>{adminContact?.username}</Text>
+              <Text style={styles.date}>
+                {lastMessage ? moment(lastMessage?.createdAt).format("DD/MM/YY") : ""}
+              </Text>
+            </View>
             <Text style={styles.message}>{adminContact?.message}</Text>
           </View>
         </TouchableOpacity>
@@ -102,7 +119,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   contentUsernameDate: {
-    width: '100%',
+    width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",

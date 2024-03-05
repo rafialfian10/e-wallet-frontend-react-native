@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
-import SocketIOFileUpload from "socketio-file-upload";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -12,9 +11,9 @@ import { UserContext } from "../Context/UserContext";
 function MessageUser({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);
 
+  const [adminOnline, setAdminOnline] = useState(false);
   const [adminContact, setAdminContact] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [siofu, setSiofu] = useState();
 
   useEffect(() => {
     socket = io(SOCKET_SERVER, {
@@ -26,9 +25,6 @@ function MessageUser({ showChat, setShowChat }) {
       },
     });
 
-    let siofuInstance = new SocketIOFileUpload(socket);
-    setSiofu(siofuInstance);
-
     // define corresponding socket listener
     socket.on("new message", () => {
       console.log("contact", adminContact);
@@ -39,6 +35,18 @@ function MessageUser({ showChat, setShowChat }) {
     socket.on("connect", () => {
       loadAdminContact();
       loadMessages();
+    });
+
+    socket.on("adminOnline", (adminId) => {
+      if (adminId === adminContact?.id) {
+        setAdminOnline(true);
+      }
+    });
+
+    socket.on("adminOffline", (adminId) => {
+      if (adminId === adminContact?.id) {
+        setAdminOnline(false);
+      }
     });
 
     // listen error sent from server
@@ -81,6 +89,7 @@ function MessageUser({ showChat, setShowChat }) {
           senderId: item?.sender.id,
           message: item?.message,
           files: item?.files,
+          createdAt: item?.createdAt,
         }));
         setMessages(dataMessages);
       }
@@ -113,6 +122,7 @@ function MessageUser({ showChat, setShowChat }) {
           <DisplayMessage
             adminContact={adminContact}
             setShowChat={setShowChat}
+            messages={messages}
           />
         </View>
       </View>
@@ -120,10 +130,10 @@ function MessageUser({ showChat, setShowChat }) {
   ) : (
     <Chat
       state={state}
+      adminOnline={adminOnline}
       adminContact={adminContact}
       messages={messages}
       setShowChat={setShowChat}
-      siofu={siofu}
     />
   );
 }

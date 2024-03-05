@@ -12,14 +12,20 @@ import {
 import { PATH_FILE } from "@env";
 
 function DisplayProfileChat({
+  userOnline,
   userContact,
+  adminOnline,
   adminContact,
   setShowChat,
+  setMessages,
   holdIndexes,
   setHoldIndexes,
 }) {
   const handleHideChat = () => {
     setShowChat(false);
+    if (typeof setMessages === "function") {
+      setMessages([]);
+    }
   };
 
   const onDeleteMessage = () => {
@@ -36,7 +42,7 @@ function DisplayProfileChat({
           onPress: () => {
             // emit event for delete messages
             socket.emit("delete messages", holdIndexes);
-            setHoldIndexes([])
+            setHoldIndexes([]);
           },
           style: "destructive",
         },
@@ -73,8 +79,14 @@ function DisplayProfileChat({
           {userContact?.username || adminContact?.username}
         </Text>
         <View style={styles.contentOnline}>
-          <Fontisto name="ellipse" size={8} color="#228B22" />
-          <Text style={styles.textOnline}>Online</Text>
+          <Fontisto
+            name="ellipse"
+            size={8}
+            color={userOnline || adminOnline ? "#228B22" : "#D9646D"}
+          />
+          <Text style={styles.textOnline}>
+            {userOnline || adminOnline ? "Online" : "Offline"}
+          </Text>
         </View>
       </View>
       <Pressable style={styles.contanetTrashEllipsis}>
