@@ -1,11 +1,6 @@
-import { useState, useEffect, useContext } from "react";
-import { io } from "socket.io-client";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, SafeAreaView, ScrollView, View, Text } from "react-native";
+import { useState, useContext } from "react";
+import { StyleSheet, SafeAreaView } from "react-native";
 
-import DisplayMessage from "../Components/displayMessage";
-import Chat from "../Components/chats";
-import { SOCKET_URL } from "@env";
 import { UserContext } from "../Context/UserContext";
 import MessageUser from "../Components/messageUser";
 import MessageAdmin from "../Components/messageAdmin";

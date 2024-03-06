@@ -15,6 +15,7 @@ function MessageAdmin({ showChat, setShowChat }) {
   const [usersContact, setUsersContact] = useState([]);
   const [userContact, setUserContact] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     socket = io(SOCKET_SERVER, {
@@ -28,26 +29,18 @@ function MessageAdmin({ showChat, setShowChat }) {
 
     // define corresponding socket listener
     socket.on("new message", () => {
-      console.log("contact", userContact);
-      console.log("triggered", userContact?.id);
+      // console.log("contact", userContact);
+      // console.log("triggered", userContact?.id);
       socket.emit("load messages", userContact?.id);
+    });
+
+    socket.on("notification", (data) => {
+      setNotifications((prev) => [...prev, data]);
     });
 
     socket.on("connect", () => {
       loadUsersContact();
       loadMessages();
-    });
-
-    socket.on("userOnline", (userId) => {
-      if (userId === userContact?.id) {
-        setUserOnline(true);
-      }
-    });
-
-    socket.on("userOffline", (userId) => {
-      if (userId === userContact?.id) {
-        setUserOnline(false);
-      }
     });
 
     // listen error sent from server
@@ -58,7 +51,6 @@ function MessageAdmin({ showChat, setShowChat }) {
     return () => {
       socket.disconnect();
     };
-
   }, [messages]);
 
   const loadUsersContact = () => {
@@ -123,6 +115,20 @@ function MessageAdmin({ showChat, setShowChat }) {
   };
 
   useEffect(() => {
+    socket.on("user online", (userId) => {
+      if (userId === userContact?.id) {
+        setUserOnline(true);
+      }
+    });
+
+    socket.on("user offline", (userId) => {
+      if (userId === userContact?.id) {
+        setUserOnline(false);
+      }
+    });
+  }, [userContact])
+
+  useEffect(() => {
     socket.on("messages deleted", (deletedIds) => {
       // Filter out the deleted messages from the current messages state
       const updatedMessages = messages.filter(
@@ -145,6 +151,8 @@ function MessageAdmin({ showChat, setShowChat }) {
             usersContact={usersContact}
             setShowChat={setShowChat}
             messages={messages}
+            notifications={notifications}
+            setNotifications={setNotifications}
             onClickUserContact={onClickUserContact}
           />
         </View>

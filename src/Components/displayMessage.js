@@ -7,54 +7,76 @@ function DisplayMessage({
   adminContact,
   usersContact,
   setShowChat,
-  onClickUserContact,
   messages,
+  notifications,
+  setNotifications,
+  onClickUserContact,
 }) {
   const lastMessage = messages[messages.length - 1];
 
-  const handleShowChat = () => {
+  const handleShowChat = (userContactId) => {
+    if (typeof setNotifications === "function") {
+      const updatedNotifications = notifications.filter(
+        (notification) => notification.senderId !== userContactId
+      );
+
+      setNotifications(updatedNotifications);
+    }
     setShowChat(true);
   };
 
   return (
     <View style={styles.contentMessage}>
       {usersContact?.length > 0 ? (
-        usersContact?.map((userContact, i) => (
-          <TouchableOpacity
-            key={i}
-            style={styles.contactContainer}
-            onPress={() => {
-              handleShowChat();
-              onClickUserContact(userContact);
-            }}
-          >
-            <View style={styles.contentPhoto}>
-              {userContact?.photo &&
-              userContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
-                <Image
-                  source={{ uri: userContact?.photo }}
-                  style={styles.photo}
-                  alt="photo"
-                />
-              ) : (
-                <Image
-                  source={require("../../assets/default-photo.png")}
-                  style={styles.photo}
-                  alt="default-photo"
-                />
-              )}
-            </View>
-            <View style={styles.contentDataUser}>
-              <View style={styles.contentUsernameDate}>
-                <Text style={styles.username}>{userContact?.username}</Text>
-                <Text style={styles.date}>
-                  {userContact ? moment(userContact?.createdAt).format("DD/MM/YY") : ""}
-                </Text>
+        usersContact?.map((userContact, i) => {
+          const notificationCount = notifications.filter(
+            (notification) => notification.senderId === userContact.id
+          ).length;
+
+          return (
+            <TouchableOpacity
+              key={i}
+              style={styles.contactContainer}
+              onPress={() => {
+                handleShowChat(userContact?.id);
+                onClickUserContact(userContact);
+              }}
+            >
+              <View style={styles.contentPhoto}>
+                {userContact?.photo &&
+                userContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
+                  <Image
+                    source={{ uri: userContact?.photo }}
+                    style={styles.photo}
+                    alt="photo"
+                  />
+                ) : (
+                  <Image
+                    source={require("../../assets/default-photo.png")}
+                    style={styles.photo}
+                    alt="default-photo"
+                  />
+                )}
               </View>
-              <Text style={styles.message}>{userContact?.message}</Text>
-            </View>
-          </TouchableOpacity>
-        ))
+              <View style={styles.contentDataUser}>
+                <View style={styles.contentUsernameDate}>
+                  <Text style={styles.username}>{userContact?.username}</Text>
+                  <Text style={styles.date}>
+                    {userContact
+                      ? moment(userContact?.createdAt).format("DD/MM/YY")
+                      : ""}
+                  </Text>
+                </View>
+                <View style={styles.contentMessageNotification}>
+                  <Text style={styles.message}>{userContact?.message}</Text>
+                  {notificationCount > 0 && (
+                    <Text style={styles.notification}>{notificationCount}</Text>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        })
       ) : (
         <TouchableOpacity
           style={styles.contactContainer}
@@ -80,10 +102,17 @@ function DisplayMessage({
             <View style={styles.contentUsernameDate}>
               <Text style={styles.username}>{adminContact?.username}</Text>
               <Text style={styles.date}>
-                {lastMessage ? moment(lastMessage?.createdAt).format("DD/MM/YY") : ""}
+                {lastMessage
+                  ? moment(lastMessage?.createdAt).format("DD/MM/YY")
+                  : ""}
               </Text>
             </View>
-            <Text style={styles.message}>{adminContact?.message}</Text>
+            <View style={styles.contentMessageNotification}>
+              <Text style={styles.message}>{adminContact?.message}</Text>
+              {notifications.length > 0 && (
+                <Text style={styles.notification}>{notifications.length}</Text>
+              )}
+            </View>
           </View>
         </TouchableOpacity>
       )}
@@ -123,6 +152,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   username: {
     textAlignVertical: "center",
@@ -135,10 +165,27 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#808080",
   },
+  contentMessageNotification: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   message: {
     fontSize: 12,
     fontWeight: "normal",
     color: "#808080",
+  },
+  notification: {
+    width: 20,
+    height: 20,
+    fontSize: 12,
+    textAlign: "center",
+    textAlignVertical: "center",
+    borderRadius: 50,
+    color: "#FFFFFF",
+    backgroundColor: "lightgreen",
   },
 });
 

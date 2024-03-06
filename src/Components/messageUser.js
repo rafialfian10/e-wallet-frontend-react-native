@@ -14,6 +14,7 @@ function MessageUser({ showChat, setShowChat }) {
   const [adminOnline, setAdminOnline] = useState(false);
   const [adminContact, setAdminContact] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     socket = io(SOCKET_SERVER, {
@@ -27,8 +28,8 @@ function MessageUser({ showChat, setShowChat }) {
 
     // define corresponding socket listener
     socket.on("new message", () => {
-      console.log("contact", adminContact);
-      console.log("triggered", adminContact?.id);
+      // console.log("contact", adminContact);
+      // console.log("triggered", adminContact?.id);
       socket.emit("load messages", adminContact?.id);
     });
 
@@ -37,16 +38,8 @@ function MessageUser({ showChat, setShowChat }) {
       loadMessages();
     });
 
-    socket.on("adminOnline", (adminId) => {
-      if (adminId === adminContact?.id) {
-        setAdminOnline(true);
-      }
-    });
-
-    socket.on("adminOffline", (adminId) => {
-      if (adminId === adminContact?.id) {
-        setAdminOnline(false);
-      }
+    socket.on("notification", (data) => {
+      setNotifications((prev) => [...prev, data]);
     });
 
     // listen error sent from server
@@ -97,6 +90,20 @@ function MessageUser({ showChat, setShowChat }) {
   };
 
   useEffect(() => {
+    socket.on("adminOnline", (adminId) => {
+      if (adminId === adminContact?.id) {
+        setAdminOnline(true);
+      }
+    });
+
+    socket.on("adminOffline", (adminId) => {
+      if (adminId === adminContact?.id) {
+        setAdminOnline(false);
+      }
+    });
+  }, [adminContact]);
+
+  useEffect(() => {
     if (adminContact) {
       loadMessages(adminContact?.id);
     }
@@ -105,7 +112,9 @@ function MessageUser({ showChat, setShowChat }) {
   useEffect(() => {
     socket.on("messages deleted", (deletedIds) => {
       // Filter out the deleted messages from the current messages state
-      const updatedMessages = messages.filter(message => !deletedIds.includes(message.id));
+      const updatedMessages = messages.filter(
+        (message) => !deletedIds.includes(message.id)
+      );
       setMessages(updatedMessages);
     });
 
@@ -123,6 +132,8 @@ function MessageUser({ showChat, setShowChat }) {
             adminContact={adminContact}
             setShowChat={setShowChat}
             messages={messages}
+            notifications={notifications}
+            setNotifications={setNotifications}
           />
         </View>
       </View>
