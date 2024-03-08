@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
@@ -10,6 +10,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 
 import DisplayLogo from "../Components/displayLogo";
@@ -81,11 +82,11 @@ const Login = ({ navigation }) => {
               type: "LOGIN_SUCCESS",
               payload: response.data.data,
             });
-            alert("Login successfully");
+            Alert.alert("", "Login successfully");
           }
         } catch (error) {
-          if (error.response && error.response.status === 400) {
-            alert(error.response.data.message);
+          if (error.response && error.response.status === 400 || error.response.status === 404) {
+            Alert.alert("", "Login failed, wrong email or password");
           } else {
             throw error;
           }

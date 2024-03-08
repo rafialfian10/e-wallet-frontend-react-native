@@ -18,7 +18,7 @@ function MessageAdmin({ showChat, setShowChat }) {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io(SOCKET_SERVER, {
+    socket = io("http://192.168.216.106:5000", {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -106,6 +106,7 @@ function MessageAdmin({ showChat, setShowChat }) {
           id: item?.id,
           senderId: item?.sender.id,
           message: item?.message,
+          notification: item?.notification,
           files: item?.files,
         }));
         setMessages(dataMessages);
@@ -149,11 +150,12 @@ function MessageAdmin({ showChat, setShowChat }) {
         <View style={styles.contactContainer}>
           <DisplayMessage
             usersContact={usersContact}
-            setShowChat={setShowChat}
             messages={messages}
+            loadMessages={loadMessages}
+            setShowChat={setShowChat}
+            onClickUserContact={onClickUserContact}
             notifications={notifications}
             setNotifications={setNotifications}
-            onClickUserContact={onClickUserContact}
           />
         </View>
       </View>

@@ -17,7 +17,7 @@ function MessageUser({ showChat, setShowChat }) {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io(SOCKET_SERVER, {
+    socket = io("http://192.168.216.106:5000", {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -81,6 +81,7 @@ function MessageUser({ showChat, setShowChat }) {
           id: item?.id,
           senderId: item?.sender.id,
           message: item?.message,
+          notification: item?.notification,
           files: item?.files,
           createdAt: item?.createdAt,
         }));
@@ -130,8 +131,9 @@ function MessageUser({ showChat, setShowChat }) {
         <View style={styles.contactContainer}>
           <DisplayMessage
             adminContact={adminContact}
-            setShowChat={setShowChat}
             messages={messages}
+            loadMessages={loadMessages}
+            setShowChat={setShowChat}
             notifications={notifications}
             setNotifications={setNotifications}
           />

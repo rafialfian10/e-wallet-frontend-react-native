@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from "react-native";
 
 import { PATH_FILE } from "@env";
@@ -34,8 +35,7 @@ function DisplayProfile({ navigation }) {
       payload: {},
     });
     navigation.navigate("Index");
-    // window.location.reload();
-    alert("Logout successfully");
+    Alert.alert("", "Logout successfully");
   };
 
   useEffect(() => {
