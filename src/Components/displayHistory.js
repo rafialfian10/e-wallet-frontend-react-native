@@ -1,13 +1,18 @@
+import { useContext } from "react";
 import moment from "moment";
 import { StyleSheet, Text, View } from "react-native";
 
 import Parse from "./parse";
+import { UserContext } from "../Context/UserContext";
 
 function DisplayHistory({ transaction }) {
+  const [state, dispatch] = useContext(UserContext);
+
   const amount = transaction?.amount
     ? transaction?.amount.toFixed(2).replace(/\./g, ",")
     : "0,00";
-  return (
+
+  return transaction?.userId === state?.user?.id ? (
     <View style={styles.contentTransactionHistory}>
       <View style={styles.subContentTransactionHistory}>
         <View style={styles.contentTransactionType}>
@@ -32,6 +37,8 @@ function DisplayHistory({ transaction }) {
         </View>
       </View>
     </View>
+  ) : (
+    ""
   );
 }
 

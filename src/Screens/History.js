@@ -46,6 +46,11 @@ const History = () => {
     }
   };
 
+  const renderItem = useCallback(
+    ({ item }) => <DisplayHistory transaction={item} />,
+    []
+  );
+
   const renderFooter = () => {
     return (
       <View style={styles.footer}>
@@ -55,11 +60,6 @@ const History = () => {
       </View>
     );
   };
-
-  const renderItem = useCallback(
-    ({ item }) => <DisplayHistory transaction={item} />,
-    []
-  );
 
   useEffect(() => {
     getData();
