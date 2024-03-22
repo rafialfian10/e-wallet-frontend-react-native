@@ -11,13 +11,13 @@ import { UserContext } from "../Context/UserContext";
 function MessageUser({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);
 
-  const [adminOnline, setAdminOnline] = useState(false);
+  const [adminsOnline, setAdminsOnline] = useState([]);
   const [adminContact, setAdminContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io("http://192.168.216.106:5000", {
+    socket = io("http://192.168.239.106:5000", {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -80,6 +80,7 @@ function MessageUser({ showChat, setShowChat }) {
         const dataMessages = data?.map((item) => ({
           id: item?.id,
           senderId: item?.sender.id,
+          recipientId: item?.recipient.id,
           message: item?.message,
           notification: item?.notification,
           files: item?.files,
@@ -91,16 +92,24 @@ function MessageUser({ showChat, setShowChat }) {
   };
 
   useEffect(() => {
-    socket.on("adminOnline", (adminId) => {
-      if (adminId === adminContact?.id) {
-        setAdminOnline(true);
-      }
+    socket.on("admin online", (adminId) => {
+      setAdminsOnline((prevAdminOnline) => {
+        const newAdminOnline = [...prevAdminOnline];
+
+        if (!newAdminOnline.includes(adminId)) {
+          newAdminOnline.push(adminId);
+        }
+        return newAdminOnline;
+      });
     });
 
-    socket.on("adminOffline", (adminId) => {
-      if (adminId === adminContact?.id) {
-        setAdminOnline(false);
-      }
+    socket.on("admin offline", (adminId) => {
+      setAdminsOnline((prevAdminOnline) => {
+        const newAdminOnline = prevAdminOnline.filter(
+          (admin) => admin !== adminId
+        );
+        return newAdminOnline;
+      });
     });
   }, [adminContact]);
 
@@ -143,9 +152,10 @@ function MessageUser({ showChat, setShowChat }) {
   ) : (
     <Chat
       state={state}
-      adminOnline={adminOnline}
+      adminsOnline={adminsOnline}
       adminContact={adminContact}
       messages={messages}
+      setMessages={setMessages}
       setShowChat={setShowChat}
     />
   );

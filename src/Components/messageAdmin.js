@@ -11,14 +11,14 @@ import { UserContext } from "../Context/UserContext";
 function MessageAdmin({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);
 
-  const [userOnline, setUserOnline] = useState(false);
+  const [usersOnline, setUsersOnline] = useState([]);
   const [usersContact, setUsersContact] = useState([]);
   const [userContact, setUserContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io("http://192.168.216.106:5000", {
+    socket = io("http://192.168.239.106:5000", {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -105,6 +105,7 @@ function MessageAdmin({ showChat, setShowChat }) {
         const dataMessages = data?.map((item) => ({
           id: item?.id,
           senderId: item?.sender.id,
+          recipientId: item?.recipient.id,
           message: item?.message,
           notification: item?.notification,
           files: item?.files,
@@ -117,17 +118,23 @@ function MessageAdmin({ showChat, setShowChat }) {
 
   useEffect(() => {
     socket.on("user online", (userId) => {
-      if (userId === userContact?.id) {
-        setUserOnline(true);
-      }
+      setUsersOnline((prevUserOnline) => {
+        const newUserOnline = [...prevUserOnline];
+
+        if (!newUserOnline.includes(userId)) {
+          newUserOnline.push(userId);
+        }
+        return newUserOnline;
+      });
     });
 
     socket.on("user offline", (userId) => {
-      if (userId === userContact?.id) {
-        setUserOnline(false);
-      }
+      setUsersOnline((prevUserOnline) => {
+        const newUserOnline = prevUserOnline.filter((user) => user !== userId);
+        return newUserOnline;
+      });
     });
-  }, [userContact])
+  }, [usersContact]);
 
   useEffect(() => {
     socket.on("messages deleted", (deletedIds) => {
@@ -163,7 +170,7 @@ function MessageAdmin({ showChat, setShowChat }) {
   ) : (
     <Chat
       state={state}
-      userOnline={userOnline}
+      usersOnline={usersOnline}
       userContact={userContact}
       messages={messages}
       setMessages={setMessages}

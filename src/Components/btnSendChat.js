@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Ionicons, MaterialIcons, EvilIcons } from "@expo/vector-icons";
 import { StyleSheet, View, TextInput, Pressable } from "react-native";
 
@@ -7,14 +7,8 @@ import HandleOpenCamera from "./handleOpenCamera";
 // import { UserContext } from "../Context/UserContext";
 // import { API } from "../Config/Api";
 
-function BtnSendChat({ userContact, adminContact, onSendMessage }) {
+function BtnSendChat({ userContact, adminContact, form, setForm, onSendMessage }) {
   // const [state, dispatch] = useContext(UserContext);
-
-  const [form, setForm] = useState({
-    message: "",
-    files: [],
-    // recipientId: userContact?.id || adminContact?.id,
-  });
 
   const handleChange = (data, value) => {
     setForm({
@@ -71,6 +65,7 @@ function BtnSendChat({ userContact, adminContact, onSendMessage }) {
     <View style={styles.contentBtnChat}>
       <TextInput
         placeholder="Type a message"
+        multiline={true}
         style={styles.inputChat}
         onChangeText={(value) => handleChange("message", value)}
         value={form.message}
@@ -121,9 +116,9 @@ const styles = StyleSheet.create({
   },
   inputChat: {
     width: "85%",
-    height: 50,
     paddingLeft: 10,
     paddingRight: 40,
+    paddingVertical: 10,
     textAlign: "left",
     textAlignVertical: "center",
     borderRadius: 25,

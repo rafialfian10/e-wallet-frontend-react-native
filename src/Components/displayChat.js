@@ -1,6 +1,6 @@
 // import RNFetchBlob from "rn-fetch-blob";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
 function DisplayChat({
   state,
@@ -100,7 +100,29 @@ function DisplayChat({
                 ))
               : ""}
             {item?.message !== "" ? (
-              <Text style={styles.textMessage}>{item?.message}</Text>
+              <View style={styles.contentMessage}>
+                <Text style={styles.textMessage}>{item?.message}</Text>
+                {item?.recipientId === adminContact?.id ||
+                item?.recipientId === userContact?.id ? (
+                  item?.notification ? (
+                    <Ionicons
+                      name="checkmark-outline"
+                      size={15}
+                      color="#000000"
+                      style={styles.checklistIcon}
+                    />
+                  ) : (
+                    <Ionicons
+                      name="checkmark-done-outline"
+                      size={15}
+                      color="#3773DB"
+                      style={styles.checklistIcon}
+                    />
+                  )
+                ) : (
+                  ""
+                )}
+              </View>
             ) : (
               ""
             )}
@@ -140,9 +162,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#000000",
   },
+  contentMessage: {
+    position: "relative",
+    flexDirection: "row",
+    alignItems: "center",
+  },
   textMessage: {
     fontSize: 14,
     color: "#000000",
+  },
+  checklistIcon: {
+    position: "relative",
+    right: 0,
+    top: 3,
+    textAlign: "center",
+    textAlignVertical: "center",
   },
   contentNoMessage: {
     width: "100%",

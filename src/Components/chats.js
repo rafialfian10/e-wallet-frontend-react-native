@@ -1,27 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StyleSheet, View, ScrollView } from "react-native";
 
 import DisplayProfileChat from "./displayProfileChat";
 import BtnSendChat from "./btnSendChat";
 import DisplayChat from "./displayChat";
+import ModalSendChatFile from "./modalSendChatFile";
 
 function Chat({
   state,
-  userOnline,
+  usersOnline,
   userContact,
-  adminOnline,
+  adminsOnline,
   adminContact,
   messages,
   setMessages,
   setShowChat,
 }) {
+  const [form, setForm] = useState({
+    message: "",
+    files: [],
+  });
   const [holdIndexes, setHoldIndexes] = useState([]);
+  const [modalChatFile, setModalChatFile] = useState(false);
+
+  const closeModalChatFile = () => {
+    setModalChatFile(false);
+  };
+
+  useEffect(() => {
+    if (form.files.length > 0) {
+      setModalChatFile(true);
+    } else {
+      setModalChatFile(false);
+    }
+  }, [form.files]);
 
   const onSendMessage = (form) => {
     const dataFiles = form.files.map((file) => ({
       uri: file.uri,
       name: file.name,
       type: file.mimeType,
+      size: file.size,
     }));
 
     const data = {
@@ -35,33 +54,46 @@ function Chat({
   };
 
   return (
-    <View style={styles.containerChat}>
-      <DisplayProfileChat
-        userOnline={userOnline}
-        userContact={userContact}
-        adminOnline={adminOnline}
-        adminContact={adminContact}
-        setMessages={setMessages}
-        setShowChat={setShowChat}
-        holdIndexes={holdIndexes}
-        setHoldIndexes={setHoldIndexes}
-      />
-      <ScrollView>
-        <DisplayChat
-          state={state}
+    <>
+      <View style={styles.containerChat}>
+        <DisplayProfileChat
+          usersOnline={usersOnline}
           userContact={userContact}
+          adminsOnline={adminsOnline}
           adminContact={adminContact}
-          messages={messages}
+          setMessages={setMessages}
+          setShowChat={setShowChat}
           holdIndexes={holdIndexes}
           setHoldIndexes={setHoldIndexes}
         />
-      </ScrollView>
-      <BtnSendChat
-        userContact={userContact}
-        adminContact={adminContact}
-        onSendMessage={onSendMessage}
-      />
-    </View>
+        <ScrollView>
+          <DisplayChat
+            state={state}
+            userContact={userContact}
+            adminContact={adminContact}
+            messages={messages}
+            holdIndexes={holdIndexes}
+            setHoldIndexes={setHoldIndexes}
+          />
+        </ScrollView>
+        <BtnSendChat
+          form={form}
+          setForm={setForm}
+          userContact={userContact}
+          adminContact={adminContact}
+          onSendMessage={onSendMessage}
+        />
+      </View>
+      {form.files.length !== 0 && (
+        <ModalSendChatFile
+          form={form}
+          setForm={setForm}
+          onSendMessage={onSendMessage}
+          modalChatFile={modalChatFile}
+          closeModalChatFile={closeModalChatFile}
+        />
+      )}
+    </>
   );
 }
 

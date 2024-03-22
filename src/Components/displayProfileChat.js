@@ -12,15 +12,18 @@ import {
 import { PATH_FILE } from "@env";
 
 function DisplayProfileChat({
-  userOnline,
+  usersOnline,
   userContact,
-  adminOnline,
+  adminsOnline,
   adminContact,
   setShowChat,
   setMessages,
   holdIndexes,
   setHoldIndexes,
 }) {
+  const isAdminOnline = adminsOnline && adminsOnline?.includes(adminContact?.id);
+  const isUserOnline = usersOnline && usersOnline.includes(userContact?.id);
+  
   const handleHideChat = () => {
     setShowChat(false);
     if (typeof setMessages === "function") {
@@ -82,10 +85,10 @@ function DisplayProfileChat({
           <Fontisto
             name="ellipse"
             size={8}
-            color={userOnline || adminOnline ? "#228B22" : "#D9646D"}
+            color={isUserOnline || isAdminOnline ? "#228B22" : "#D9646D"}
           />
           <Text style={styles.textOnline}>
-            {userOnline || adminOnline ? "Online" : "Offline"}
+            {isUserOnline || isAdminOnline ? "Online" : "Offline"}
           </Text>
         </View>
       </View>
