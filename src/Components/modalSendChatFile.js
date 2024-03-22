@@ -58,7 +58,7 @@ function ModalSendChatFile({ form, setForm, onSendMessage, modalChatFile, closeM
               <View key={i} style={styles.files}>
                 <AntDesign name="file1" size={30} color="black" />
                 <Text style={styles.filename}>{file?.name.length > 30 ? file?.name.substring(0, 30) + "..." : file?.name}</Text>
-                <MaterialIcons name="cancel" size={16} color="#F75964" onPress={() => deleteFile(i)} />
+                <MaterialIcons name="cancel" size={20} color="#F75964" onPress={() => deleteFile(i)} style={styles.deleteIcon} />
               </View>
             ))}
           </ScrollView>
@@ -121,6 +121,10 @@ const styles = StyleSheet.create({
   },
   filename: {
     marginHorizontal: 5,
+  },
+  deleteIcon: {
+    textAlign: "center",
+    textAlignVertical: "center",
   },
   contentBtnChat: {
     width: "95%",
