@@ -5,87 +5,67 @@ import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 import { PATH_FILE } from "@env";
 
 function DisplayMessage({
-  adminContact,
+  adminsContact,
   usersContact,
   messages,
-  loadMessages,
-  setShowChat,
-  onClickUserContact,
   notifications,
   setNotifications,
+  setShowChat,
+  onClickContact,
 }) {
   const [allNotification, setAllNotification] = useState([]);
 
-  const lastMessage = messages[messages.length - 1];
-
   const handleShowChat = (id) => {
     setShowChat(true);
-
-    const filteredNotifications = allNotification?.filter(
-      (notification) => notification?.notification === id
-    );
-    if (filteredNotifications.length > 0) {
-      socket.emit("delete notification", filteredNotifications);
-    }
-
-    if (typeof loadMessages === "function") {
-      loadMessages(adminContact?.id);
-      loadMessages();
-    }
-
-    // if (typeof setNotifications === "function") {
-    //   const updatedNotifications = notifications?.filter(
-    //     (notification) => notification.senderId !== userContactId
-    //   );
-
-    //   setNotifications(updatedNotifications);
-    // }
   };
 
-  // notification from admin
+  // notification from admin for users
   useEffect(() => {
-    const dataNotifications = messages
-      ?.map((message) => ({
-        id: message?.id,
-        notification: message?.notification,
-      }))
-      .filter(
-        (notification) => notification?.notification === adminContact?.id
-      );
+    const dataNotifications = [];
 
-    setAllNotification(dataNotifications);
-  }, [messages, adminContact]);
-
-  // notification from users
-  useEffect(() => {
-    const newData = [];
-
-    usersContact?.map((userContact) => {
-      userContact?.senderMessage?.map((data) => {
-        newData.push({ id: data.id, notification: data.notification });
+    adminsContact?.forEach((adminContact) => {
+      adminContact?.senderMessage?.forEach((message) => {
+        dataNotifications.push({
+          id: message?.id,
+          notification: message?.notification,
+        });
       });
     });
 
-    setAllNotification(newData);
-  }, [usersContact]);
+    setAllNotification(dataNotifications);
+  }, [adminsContact, messages]);
+
+  // notification from users for admin
+  useEffect(() => {
+    const dataNotifications = [];
+
+    usersContact?.forEach((userContact) => {
+      userContact?.senderMessage?.forEach((message) => {
+        dataNotifications.push({
+          id: message?.id,
+          notification: message?.notification,
+        });
+      });
+    });
+
+    setAllNotification(dataNotifications);
+  }, [usersContact, messages]);
 
   return (
     <View style={styles.contentMessage}>
-      {usersContact?.length > 0 ? (
+      {(usersContact?.length > 0 || usersContact !== undefined) &&
         usersContact?.map((userContact, i) => {
           const notificationCount = allNotification?.filter(
             (notification) => notification?.notification === userContact?.id
           ).length;
-          // const notificationCount = notifications.filter(
-          //   (notification) => notification.senderId === userContact.id
-          // ).length;
+
           return (
             <TouchableOpacity
               key={i}
               style={styles.contactContainer}
               onPress={() => {
                 handleShowChat(userContact?.id);
-                onClickUserContact(userContact);
+                onClickContact(userContact);
               }}
             >
               <View style={styles.contentPhoto}>
@@ -122,51 +102,57 @@ function DisplayMessage({
               </View>
             </TouchableOpacity>
           );
-        })
-      ) : (
-        <TouchableOpacity
-          style={styles.contactContainer}
-          onPress={() => handleShowChat(adminContact?.id)}
-        >
-          <View style={styles.contentPhoto}>
-            {adminContact?.photo &&
-            adminContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
-              <Image
-                source={{ uri: adminContact?.photo }}
-                style={styles.photo}
-                alt="photo"
-              />
-            ) : (
-              <Image
-                source={require("../../assets/default-photo.png")}
-                style={styles.photo}
-                alt="default-photo"
-              />
-            )}
-          </View>
-          <View style={styles.contentDataUser}>
-            <View style={styles.contentUsernameDate}>
-              <Text style={styles.username}>{adminContact?.username}</Text>
-              <Text style={styles.date}>
-                {lastMessage
-                  ? moment(lastMessage?.createdAt).format("DD/MM/YY")
-                  : ""}
-              </Text>
-            </View>
-            <View style={styles.contentMessageNotification}>
-              <Text style={styles.message}>{adminContact?.message}</Text>
-              {allNotification.length > 0 && (
-                <Text style={styles.notification}>
-                  {allNotification.length}
-                </Text>
-              )}
-              {/* {notifications.length > 0 && (
-                <Text style={styles.notification}>{notifications.length}</Text>
-              )} */}
-            </View>
-          </View>
-        </TouchableOpacity>
-      )}
+        })}
+      {(adminsContact?.length > 0 || adminsContact !== undefined) &&
+        adminsContact?.map((adminContact, i) => {
+          const notificationCount = allNotification?.filter(
+            (notification) => notification?.notification === adminContact?.id
+          ).length;
+
+          return (
+            <TouchableOpacity
+              key={i}
+              style={styles.contactContainer}
+              onPress={() => {
+                handleShowChat(adminContact?.id);
+                onClickContact(adminContact);
+              }}
+            >
+              <View style={styles.contentPhoto}>
+                {adminContact?.photo &&
+                adminContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
+                  <Image
+                    source={{ uri: adminContact?.photo }}
+                    style={styles.photo}
+                    alt="photo"
+                  />
+                ) : (
+                  <Image
+                    source={require("../../assets/default-photo.png")}
+                    style={styles.photo}
+                    alt="default-photo"
+                  />
+                )}
+              </View>
+              <View style={styles.contentDataUser}>
+                <View style={styles.contentUsernameDate}>
+                  <Text style={styles.username}>{adminContact?.username}</Text>
+                  <Text style={styles.date}>
+                    {adminContact
+                      ? moment(adminContact?.createdAt).format("DD/MM/YY")
+                      : ""}
+                  </Text>
+                </View>
+                <View style={styles.contentMessageNotification}>
+                  <Text style={styles.message}>{adminContact?.message}</Text>
+                  {notificationCount > 0 && (
+                    <Text style={styles.notification}>{notificationCount}</Text>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
     </View>
   );
 }
@@ -231,7 +217,7 @@ const styles = StyleSheet.create({
   notification: {
     width: 20,
     height: 20,
-    fontSize: 12,
+    fontSize: 11,
     textAlign: "center",
     textAlignVertical: "center",
     borderRadius: 50,

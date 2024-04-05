@@ -18,7 +18,7 @@ function MessageAdmin({ showChat, setShowChat }) {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io("http://192.168.239.106:5000", {
+    socket = io("http://192.168.89.106:5000", {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -32,6 +32,12 @@ function MessageAdmin({ showChat, setShowChat }) {
       // console.log("contact", userContact);
       // console.log("triggered", userContact?.id);
       socket.emit("load messages", userContact?.id);
+    });
+
+    socket.on("notification deleted", () => {
+      if(userContact) {
+        socket.emit("load messages", userContact?.id);
+      }
     });
 
     socket.on("notification", (data) => {
@@ -90,7 +96,6 @@ function MessageAdmin({ showChat, setShowChat }) {
     });
   };
 
-  // used for active style when click contact
   const onClickUserContact = (data) => {
     setUserContact(data);
 
@@ -109,6 +114,7 @@ function MessageAdmin({ showChat, setShowChat }) {
           message: item?.message,
           notification: item?.notification,
           files: item?.files,
+          createdAt: item?.createdAt,
         }));
         setMessages(dataMessages);
       }
@@ -158,11 +164,10 @@ function MessageAdmin({ showChat, setShowChat }) {
           <DisplayMessage
             usersContact={usersContact}
             messages={messages}
-            loadMessages={loadMessages}
-            setShowChat={setShowChat}
-            onClickUserContact={onClickUserContact}
             notifications={notifications}
             setNotifications={setNotifications}
+            onClickContact={onClickUserContact}
+            setShowChat={setShowChat}
           />
         </View>
       </View>

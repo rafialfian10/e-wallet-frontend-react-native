@@ -12,12 +12,13 @@ function MessageUser({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);
 
   const [adminsOnline, setAdminsOnline] = useState([]);
+  const [adminsContact, setAdminsContact] = useState([]);
   const [adminContact, setAdminContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io("http://192.168.239.106:5000", {
+    socket = io("http://192.168.89.106:5000", {
       auth: {
         token: AsyncStorage.getItem("token"),
       },
@@ -33,13 +34,20 @@ function MessageUser({ showChat, setShowChat }) {
       socket.emit("load messages", adminContact?.id);
     });
 
-    socket.on("connect", () => {
-      loadAdminContact();
-      loadMessages();
+    // define corresponding socket listener
+    socket.on("notification deleted", () => {
+      if(adminContact) {
+        socket.emit("load messages", adminContact?.id);
+      }
     });
 
     socket.on("notification", (data) => {
       setNotifications((prev) => [...prev, data]);
+    });
+
+    socket.on("connect", () => {
+      loadAdminsContact();
+      loadMessages();
     });
 
     // listen error sent from server
@@ -50,33 +58,54 @@ function MessageUser({ showChat, setShowChat }) {
     return () => {
       socket.disconnect();
     };
-  }, [messages, adminContact?.id]);
+  }, [messages]);
 
-  const loadAdminContact = () => {
-    // emit corresponding event to load admin contact
-    socket.emit("load admin contact");
+  const loadAdminsContact = () => {
+    socket.emit("load admins contact");
 
-    // listen event to get admin contact
-    socket.on("admin contact", async (data) => {
-      // manipulate data to add message property with the newest message
-      const dataAdminContact = {
-        ...data,
-        message:
-          messages.length > 0
-            ? messages[messages.length - 1].message
-            : "Click here to start message",
-      };
-      setAdminContact(dataAdminContact);
+    socket.on("admins contact", (data) => {
+      // filter just customers which have sent a message
+      let dataAdminsContact = data?.filter(
+        (item) =>
+          item?.recipientMessage.length >= 0 || item?.senderMessage.length >= 0
+      );
+
+      // manipulate customers to add message property with the newest message
+      dataAdminsContact = dataAdminsContact?.map((item) => {
+        const allMessages = [...item.senderMessage, ...item.recipientMessage];
+
+        // sort by createAt
+        allMessages.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+
+        return {
+          ...item,
+          message:
+            allMessages.length > 0
+              ? allMessages[allMessages.length - 1].message
+              : "Click here to start message",
+          createdAt:
+            allMessages.length > 0
+              ? allMessages[allMessages.length - 1].createdAt
+              : "",
+        };
+      });
+      setAdminsContact(dataAdminsContact);
     });
   };
 
-  const loadMessages = (id) => {
-    // emit event load messages
-    socket.emit("load messages", id);
+  const onClickAdminContact = (data) => {
+    setAdminContact(data);
 
+    // emit event load messages
+    socket.emit("load messages", data?.id);
+  };
+
+  const loadMessages = () => {
     // define listener on event "messages"
-    socket.on("messages", async (data) => {
-      if (data?.length > 0) {
+    socket.on("messages", (data) => {
+      if (data?.length >= 0) {
         const dataMessages = data?.map((item) => ({
           id: item?.id,
           senderId: item?.sender.id,
@@ -88,6 +117,7 @@ function MessageUser({ showChat, setShowChat }) {
         }));
         setMessages(dataMessages);
       }
+      loadAdminsContact();
     });
   };
 
@@ -111,20 +141,14 @@ function MessageUser({ showChat, setShowChat }) {
         return newAdminOnline;
       });
     });
-  }, [adminContact]);
-
-  useEffect(() => {
-    if (adminContact) {
-      loadMessages(adminContact?.id);
-    }
-  }, [adminContact?.id]);
+  }, [adminsContact]);
 
   useEffect(() => {
     socket.on("messages deleted", (deletedIds) => {
-      // Filter out the deleted messages from the current messages state
-      const updatedMessages = messages.filter(
-        (message) => !deletedIds.includes(message.id)
+      const updatedMessages = messages?.filter(
+        (message) => !deletedIds.includes(message?.id)
       );
+
       setMessages(updatedMessages);
     });
 
@@ -139,12 +163,12 @@ function MessageUser({ showChat, setShowChat }) {
         <Text style={styles.textLogo}>E-Wallet</Text>
         <View style={styles.contactContainer}>
           <DisplayMessage
-            adminContact={adminContact}
+            adminsContact={adminsContact}
             messages={messages}
-            loadMessages={loadMessages}
-            setShowChat={setShowChat}
             notifications={notifications}
             setNotifications={setNotifications}
+            onClickContact={onClickAdminContact}
+            setShowChat={setShowChat}
           />
         </View>
       </View>

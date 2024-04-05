@@ -59,7 +59,9 @@ function FilterTransaction({
         setSelected={handleOption}
         data={selectOptions}
         save="value"
-        style={styles.selectOptions}
+        searchPlaceholder="search...."
+        boxStyles={styles.selectOptions}
+        dropdownStyles={styles.selectOptions}
       />
     </View>
   );
@@ -72,10 +74,10 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
   },
   selectOptions: {
-    borderRadius: 5,
+    borderRadius: 10,
     borderTopRightRadius: 0,
     borderBottomRightRadius: 0,
-  },
+  }
 });
 
 export default FilterTransaction;

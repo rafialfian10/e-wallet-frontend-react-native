@@ -1,4 +1,5 @@
 // import RNFetchBlob from "rn-fetch-blob";
+import { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
@@ -43,6 +44,18 @@ function DisplayChat({
   const handleClick = (index) => {
     setHoldIndexes(holdIndexes.filter((i) => i !== index));
   };
+
+  useEffect(() => {
+    const filteredNotifications = messages?.filter(
+      (message) =>
+      message?.notification === adminContact?.id ||
+      message?.notification === userContact?.id
+    );
+
+    if (filteredNotifications.length > 0) {
+      socket.emit("delete notification", filteredNotifications);
+    }
+  });
 
   return (
     <View style={styles.contentChat}>
@@ -104,21 +117,16 @@ function DisplayChat({
                 <Text style={styles.textMessage}>{item?.message}</Text>
                 {item?.recipientId === adminContact?.id ||
                 item?.recipientId === userContact?.id ? (
-                  item?.notification ? (
-                    <Ionicons
-                      name="checkmark-outline"
-                      size={15}
-                      color="#000000"
-                      style={styles.checklistIcon}
-                    />
-                  ) : (
-                    <Ionicons
-                      name="checkmark-done-outline"
-                      size={15}
-                      color="#3773DB"
-                      style={styles.checklistIcon}
-                    />
-                  )
+                  <Ionicons
+                    name={
+                      item?.notification !== null
+                        ? "checkmark-outline"
+                        : "checkmark-done-outline"
+                    }
+                    size={15}
+                    color={item.notification !== null ? "#000000" : "#3773DB"}
+                    style={styles.checklistIcon}
+                  />
                 ) : (
                   ""
                 )}

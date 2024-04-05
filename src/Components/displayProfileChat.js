@@ -21,14 +21,13 @@ function DisplayProfileChat({
   holdIndexes,
   setHoldIndexes,
 }) {
-  const isAdminOnline = adminsOnline && adminsOnline?.includes(adminContact?.id);
+  const isAdminOnline =
+    adminsOnline && adminsOnline?.includes(adminContact?.id);
   const isUserOnline = usersOnline && usersOnline.includes(userContact?.id);
-  
+
   const handleHideChat = () => {
     setShowChat(false);
-    if (typeof setMessages === "function") {
-      setMessages([]);
-    }
+    setMessages([]);
   };
 
   const onDeleteMessage = () => {

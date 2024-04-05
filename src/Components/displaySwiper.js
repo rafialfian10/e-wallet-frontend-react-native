@@ -4,7 +4,13 @@ import { StyleSheet, View, Image } from "react-native";
 function DisplaySwiper() {
   return (
     <View style={styles.contentSwiper}>
-      <Swiper style={styles.wrapper} showsButtons={true}>
+      <Swiper
+        style={styles.wrapper}
+        showsButtons={true}
+        showsPagination={true}
+        buttonWrapperStyle={styles.btnWrapper}
+        paginationStyle={styles.pagination}
+      >
         <View style={styles.slide}>
           <Image
             source={require("../../assets/telkom.png")}
@@ -34,7 +40,7 @@ function DisplaySwiper() {
 const styles = StyleSheet.create({
   contentSwiper: {
     width: "100%",
-    height: 175,
+    height: 200,
     marginBottom: 30,
     display: "flex",
     justifyContent: "center",
@@ -46,8 +52,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  btnWrapper: {
+    height: 175,
+    display: "flex",
+    alignItems: "center",
+  },
+  pagination: {
+    position: "absolute",
+    bottom: 5,
+  },
   slide: {
     width: "85%",
+    height: 175,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -65,6 +81,7 @@ const styles = StyleSheet.create({
   },
   imgSwiper: {
     width: "100%",
+    height: "100%",
     margin: 0,
     borderRadius: 10,
   },
