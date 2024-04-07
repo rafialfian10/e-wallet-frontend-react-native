@@ -36,15 +36,16 @@ function Chat({
   }, [form.files]);
 
   const onSendMessage = (form) => {
-    const dataFiles = form.files.map((file) => ({
-      uri: file.uri,
-      name: file.name,
-      type: file.mimeType,
-      size: file.size,
+    const dataFiles = form?.files?.map((file) => ({
+      uri: file?.uri,
+      fileName: file?.fileName,
+      fileType: file?.fileType || file?.mimeType,
+      fileSize: file?.fileSize || file?.filesize,
+      base64: file?.base64,
     }));
 
     const data = {
-      message: form.message,
+      message: form?.message,
       files: dataFiles,
       recipientId: userContact?.id || adminContact?.id,
     };

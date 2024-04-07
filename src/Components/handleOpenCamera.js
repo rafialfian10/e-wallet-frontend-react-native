@@ -5,18 +5,20 @@ async function HandleOpenCamera({ form, setForm }) {
     await ImagePicker.requestCameraPermissionsAsync();
     let result = await ImagePicker.launchCameraAsync({
       cameraType: ImagePicker.CameraType.front,
-      allowsEditing: true,
+      // allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
+      base64: true,
     });
 
     delete result.cancelled;
 
     if (!result.canceled) {
-      const imageUri = result.assets;
+      const image = result.assets[0];
+
       setForm({
         ...form,
-        files: imageUri,
+        files: [...form.files, image],
       });
     }
   } catch (error) {

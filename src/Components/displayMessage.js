@@ -88,7 +88,7 @@ function DisplayMessage({
                 <View style={styles.contentUsernameDate}>
                   <Text style={styles.username}>{userContact?.username}</Text>
                   <Text style={styles.date}>
-                    {userContact
+                    {userContact.createdAt
                       ? moment(userContact?.createdAt).format("DD/MM/YY")
                       : ""}
                   </Text>
@@ -138,7 +138,7 @@ function DisplayMessage({
                 <View style={styles.contentUsernameDate}>
                   <Text style={styles.username}>{adminContact?.username}</Text>
                   <Text style={styles.date}>
-                    {adminContact
+                    {adminContact.createdAt
                       ? moment(adminContact?.createdAt).format("DD/MM/YY")
                       : ""}
                   </Text>

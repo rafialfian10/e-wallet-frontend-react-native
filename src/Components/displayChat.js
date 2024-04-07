@@ -1,6 +1,6 @@
 // import RNFetchBlob from "rn-fetch-blob";
-import { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useEffect } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 
 function DisplayChat({
@@ -48,8 +48,8 @@ function DisplayChat({
   useEffect(() => {
     const filteredNotifications = messages?.filter(
       (message) =>
-      message?.notification === adminContact?.id ||
-      message?.notification === userContact?.id
+        message?.notification === adminContact?.id ||
+        message?.notification === userContact?.id
     );
 
     if (filteredNotifications.length > 0) {
@@ -92,11 +92,11 @@ function DisplayChat({
             onPress={() => handleClick(item?.id)}
           >
             {item?.files !== null
-              ? item.files.map((file, i) => (
+              ? item?.files?.map((file, i) => (
                   <View key={i} style={styles.contentDownloadFile}>
                     <TouchableOpacity
                       style={styles.btnDownloadFile}
-                      onPress={() => handleDownloadFile(file?.file)}
+                      onPress={() => handleDownloadFile(file?.filePath)}
                     >
                       <MaterialCommunityIcons
                         name="download"
@@ -105,9 +105,9 @@ function DisplayChat({
                       />
                     </TouchableOpacity>
                     <Text style={styles.textFile}>
-                      {file?.file?.length > 30
-                        ? file?.file.slice(0, 30) + "..."
-                        : file?.file}
+                      {file?.fileName?.length > 30
+                        ? file?.fileName.slice(0, 30) + "..."
+                        : file?.fileName}
                     </Text>
                   </View>
                 ))

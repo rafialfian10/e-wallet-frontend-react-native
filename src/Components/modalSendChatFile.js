@@ -15,7 +15,13 @@ import {
   Pressable,
 } from "react-native";
 
-function ModalSendChatFile({ form, setForm, onSendMessage, modalChatFile, closeModalChatFile }) {
+function ModalSendChatFile({
+  form,
+  setForm,
+  onSendMessage,
+  modalChatFile,
+  closeModalChatFile,
+}) {
   const handleChange = (data, value) => {
     setForm({
       ...form,
@@ -25,7 +31,7 @@ function ModalSendChatFile({ form, setForm, onSendMessage, modalChatFile, closeM
 
   const deleteFile = (index) => {
     const updatedFiles = form.files.filter((file, i) => i !== index);
-    handleChange('files', updatedFiles);
+    handleChange("files", updatedFiles);
   };
 
   const handleSendFileMessage = () => {
@@ -40,11 +46,7 @@ function ModalSendChatFile({ form, setForm, onSendMessage, modalChatFile, closeM
 
   return (
     <View style={styles.centeredView}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalChatFile}
-      >
+      <Modal animationType="slide" transparent={true} visible={modalChatFile}>
         <View style={styles.modalViewChatFile}>
           <TouchableOpacity
             style={styles.btnCloseModalSendFile}
@@ -54,11 +56,21 @@ function ModalSendChatFile({ form, setForm, onSendMessage, modalChatFile, closeM
           </TouchableOpacity>
 
           <ScrollView style={styles.contentFiles}>
-            {form.files.map((file, i) => (
+            {form?.files?.map((file, i) => (
               <View key={i} style={styles.files}>
                 <AntDesign name="file1" size={30} color="black" />
-                <Text style={styles.filename}>{file?.name.length > 30 ? file?.name.substring(0, 30) + "..." : file?.name}</Text>
-                <MaterialIcons name="cancel" size={20} color="#F75964" onPress={() => deleteFile(i)} style={styles.deleteIcon} />
+                <Text style={styles.filename}>
+                  {file?.fileName.length > 30
+                    ? file?.fileName.substring(0, 30) + "..."
+                    : file?.fileName}
+                </Text>
+                <MaterialIcons
+                  name="cancel"
+                  size={20}
+                  color="#F75964"
+                  onPress={() => deleteFile(i)}
+                  style={styles.deleteIcon}
+                />
               </View>
             ))}
           </ScrollView>
