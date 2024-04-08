@@ -11,9 +11,11 @@ import {
   Modal,
   Text,
   TextInput,
-  TouchableOpacity,
   Pressable,
+  TouchableOpacity,
 } from "react-native";
+
+import HandleOpenDocument from "./handleOpenDocument";
 
 function ModalSendChatFile({
   form,
@@ -84,13 +86,13 @@ function ModalSendChatFile({
               value={form.message}
             />
             <View style={styles.contentIcon}>
-              <Pressable style={styles.iconAttachFile}>
+              <TouchableOpacity style={styles.iconAttachFile} onPress={() => HandleOpenDocument({ form, setForm })}>
                 <MaterialCommunityIcons
                   name="image-plus"
                   size={24}
                   color="#808080"
                 />
-              </Pressable>
+              </TouchableOpacity>
             </View>
             <Pressable style={styles.btnSend} onPress={handleSendFileMessage}>
               <Ionicons name="send" size={22} color="#FFFFFF" />

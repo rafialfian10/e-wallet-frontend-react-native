@@ -1,31 +1,30 @@
 import * as DocumentPicker from "expo-document-picker";
-import { Buffer } from 'buffer';
-
+import * as FileSystem from "expo-file-system";
 
 async function HandleOpenDocument({ form, setForm }) {
   try {
     let result = await DocumentPicker.getDocumentAsync({
       multiple: true,
-      base64: true,
-      // copyToCacheDirectory: false,
-      // type: "*/*",
+      copyToCacheDirectory: true,
+      type: "*/*",
     });
 
     delete result.cancelled;
 
     if (!result.canceled) {
-      const files = result?.assets?.map((asset) => {
-        const base64 = Buffer.from(asset?.uri, 'binary').toString('base64');
-        console.log(base64);
+      const files = await Promise.all(
+        result?.assets?.map(async (asset) => {
+          const base64 = await FileSystem.readAsStringAsync(asset?.uri, { encoding: FileSystem?.EncodingType?.Base64 });
 
-        return {
-          uri: asset?.uri,
-          fileName: asset?.name,
-          fileType: asset?.mimeType,
-          fileSize: asset?.size,
-          base64: base64,
-        };
-      });
+          return {
+            uri: asset?.uri,
+            fileName: asset?.name,
+            fileType: asset?.mimeType,
+            fileSize: asset?.size,
+            base64: base64,
+          };
+        })
+      );
 
       setForm({
         ...form,
