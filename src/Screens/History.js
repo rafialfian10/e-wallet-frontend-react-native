@@ -6,6 +6,7 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 
 import DisplayHistory from "../Components/displayHistory";
@@ -14,6 +15,7 @@ import FilterTransaction from "../Components/filterTransaction";
 import { GetTransactionsUser } from "../Components/Common/Hooks/getTransactionsUser";
 
 const History = () => {
+  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState("");
   const [option, setOption] = useState("");
 
@@ -65,6 +67,12 @@ const History = () => {
     getData();
   }, [page]);
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    refetchTransactionsUser();
+    setRefreshing(false);
+  };
+
   return (
     <SafeAreaView style={styles.containerHistory}>
       <View style={styles.contentHistory}>
@@ -105,7 +113,10 @@ const History = () => {
           ListFooterComponent={renderFooter}
           onEndReached={getData}
           onEndReachedThreshold={0.5}
-          contentContainerStyle={{ height: "auto", paddingBottom: 300 }}
+          contentContainerStyle={styles.contentFlatLish}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
         />
       </View>
     </SafeAreaView>
@@ -145,6 +156,10 @@ const styles = StyleSheet.create({
   },
   containerPagination: {
     width: "100%",
+  },
+  contentFlatLish: {
+    height: "auto",
+    paddingBottom: 300,
   },
   footer: {
     width: "100%",

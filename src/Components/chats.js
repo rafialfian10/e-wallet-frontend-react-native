@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, View, ScrollView } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import DisplayProfileChat from "./displayProfileChat";
 import BtnSendChat from "./btnSendChat";
 import DisplayChat from "./displayChat";
 import ModalSendChatFile from "./modalSendChatFile";
+import RefreshPage from "./refreshPage";
 
 function Chat({
   state,
@@ -15,6 +16,7 @@ function Chat({
   messages,
   setMessages,
   setShowChat,
+  handleRefresh,
 }) {
   const [form, setForm] = useState({
     message: "",
@@ -54,6 +56,8 @@ function Chat({
     socket.emit("send message", data);
   };
 
+  console.log(handleRefresh);
+
   return (
     <>
       <View style={styles.containerChat}>
@@ -67,7 +71,7 @@ function Chat({
           holdIndexes={holdIndexes}
           setHoldIndexes={setHoldIndexes}
         />
-        <ScrollView>
+        <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
           <DisplayChat
             state={state}
             userContact={userContact}
@@ -76,7 +80,7 @@ function Chat({
             holdIndexes={holdIndexes}
             setHoldIndexes={setHoldIndexes}
           />
-        </ScrollView>
+        </RefreshPage>
         <BtnSendChat
           form={form}
           setForm={setForm}

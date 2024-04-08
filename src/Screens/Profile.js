@@ -14,6 +14,7 @@ import {
 
 import ModalProfile from "../Components/modalProfile";
 import ModalPhoto from "../Components/modalPhoto";
+import RefreshPage from "../Components/refreshPage";
 import { PATH_FILE } from "@env";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
@@ -61,6 +62,10 @@ const Profile = () => {
     }
   }, [user]);
 
+  const handleRefresh = () => {
+    refetchUser();
+  };
+
   return (
     <SafeAreaView style={styles.containerProfile}>
       {isLoadingUser ? (
@@ -70,7 +75,7 @@ const Profile = () => {
           textStyle={styles.spinner}
         />
       ) : (
-        <ScrollView style={styles.contentProfile}>
+        <RefreshPage pageStyle={styles.contentProfile} onRefresh={handleRefresh}>
           <View style={styles.subContentProfile}>
             <TouchableOpacity
               style={styles.hamburger}
@@ -151,7 +156,7 @@ const Profile = () => {
             setModalProfile={setModalProfile}
             setNewURLPhoto={setNewURLPhoto}
           />
-        </ScrollView>
+        </RefreshPage>
       )}
     </SafeAreaView>
   );

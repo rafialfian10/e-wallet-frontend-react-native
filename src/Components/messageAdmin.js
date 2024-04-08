@@ -1,12 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chats";
 import { SOCKET_SERVER } from "@env";
 import { UserContext } from "../Context/UserContext";
+import RefreshPage from "./refreshPage";
 
 function MessageAdmin({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);
@@ -156,8 +157,13 @@ function MessageAdmin({ showChat, setShowChat }) {
     };
   }, [messages]);
 
+  const handleRefresh = () => {
+    socket.emit("load messages", userContact?.id)
+    loadUsersContact();
+  };
+
   return !showChat ? (
-    <ScrollView>
+    <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
       <View style={styles.subContainerMessage}>
         <Text style={styles.textLogo}>E-Wallet</Text>
         <View style={styles.contactContainer}>
@@ -171,7 +177,7 @@ function MessageAdmin({ showChat, setShowChat }) {
           />
         </View>
       </View>
-    </ScrollView>
+    </RefreshPage>
   ) : (
     <Chat
       state={state}
@@ -180,6 +186,7 @@ function MessageAdmin({ showChat, setShowChat }) {
       messages={messages}
       setMessages={setMessages}
       setShowChat={setShowChat}
+      handleRefresh={handleRefresh}
     />
   );
 }

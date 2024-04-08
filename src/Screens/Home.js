@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StyleSheet, SafeAreaView, ScrollView, View } from "react-native";
+import { StyleSheet, SafeAreaView, View } from "react-native";
 
 import DisplayProfile from "../Components/displayProfile";
 import DisplaySaldo from "../Components/displaySaldo";
@@ -7,8 +7,12 @@ import DisplayTransaction from "../Components/displayTransaction";
 import DisplayCategory from "../Components/displayCategory";
 import DisplaySwiper from "../Components/displaySwiper";
 import ModalTransactionSuccess from "../Components/modalTransactionSuccess";
+// import RefreshPage from "../Components/refreshPage";
+import { GetUser } from "../Components/Common/Hooks/getUser";
+import RefreshPage from "../Components/refreshPage";
 
 const Home = ({ navigation }) => {
+  const { user, refetchUser } = GetUser();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTopupSuccess, setModalTopupSuccess] = useState(false);
   const [dataTopupSuccess, setDataTopupSuccess] = useState({
@@ -16,13 +20,17 @@ const Home = ({ navigation }) => {
     data: {},
   });
 
+  const handleRefresh = () => {
+    refetchUser();
+  };
+
   return (
     <SafeAreaView style={styles.containerHome}>
-      <ScrollView>
+      <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
         <View>
           <View style={styles.containerProfile}>
             <DisplayProfile navigation={navigation} />
-            <DisplaySaldo />
+            <DisplaySaldo user={user} />
             <DisplayTransaction navigation={navigation} />
           </View>
         </View>
@@ -32,7 +40,7 @@ const Home = ({ navigation }) => {
         <View style={styles.containerSwiper}>
           <DisplaySwiper />
         </View>
-      </ScrollView>
+      </RefreshPage>
       {modalTopupSuccess && (
         <ModalTransactionSuccess
           navigation={navigation}
@@ -43,6 +51,7 @@ const Home = ({ navigation }) => {
           dataTransactionSuccess={dataTopupSuccess}
         />
       )}
+      <RefreshPage onRefresh={handleRefresh} />
     </SafeAreaView>
   );
 };

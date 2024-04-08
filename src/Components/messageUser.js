@@ -1,10 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chats";
+import RefreshPage from "./refreshPage";
 import { SOCKET_SERVER } from "@env";
 import { UserContext } from "../Context/UserContext";
 
@@ -157,8 +158,13 @@ function MessageUser({ showChat, setShowChat }) {
     };
   }, [messages]);
 
+  const handleRefresh = () => {
+    socket.emit("load messages", adminContact?.id)
+    loadAdminsContact();
+  };
+
   return !showChat ? (
-    <ScrollView>
+    <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
       <View style={styles.subContainerMessage}>
         <Text style={styles.textLogo}>E-Wallet</Text>
         <View style={styles.contactContainer}>
@@ -172,16 +178,17 @@ function MessageUser({ showChat, setShowChat }) {
           />
         </View>
       </View>
-    </ScrollView>
+    </RefreshPage>
   ) : (
-    <Chat
-      state={state}
-      adminsOnline={adminsOnline}
-      adminContact={adminContact}
-      messages={messages}
-      setMessages={setMessages}
-      setShowChat={setShowChat}
-    />
+      <Chat
+        state={state}
+        adminsOnline={adminsOnline}
+        adminContact={adminContact}
+        messages={messages}
+        setMessages={setMessages}
+        setShowChat={setShowChat}
+        handleRefresh={handleRefresh}
+      />
   );
 }
 

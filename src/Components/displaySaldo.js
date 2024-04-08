@@ -3,10 +3,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StyleSheet, Image, Text, View, TouchableOpacity } from "react-native";
 
 import Parse from "./parse";
-import { GetUser } from "./Common/Hooks/getUser";
 
-function DisplaySaldo() {
-  const { user } = GetUser();
+function DisplaySaldo({user}) {
   const balance = user?.balance?.balance
     ? user?.balance?.balance.toFixed(2).replace(/\./g, ",")
     : "0,00";
