@@ -1,7 +1,6 @@
 import { StyleSheet, View, Image, Text, TouchableOpacity } from "react-native";
 
 function DisplayTransaction({ navigation }) {
-
   return (
     <View style={styles.contentTransaction}>
       <TouchableOpacity
