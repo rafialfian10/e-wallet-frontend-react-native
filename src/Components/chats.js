@@ -56,8 +56,6 @@ function Chat({
     socket.emit("send message", data);
   };
 
-  console.log(handleRefresh);
-
   return (
     <>
       <View style={styles.containerChat}>

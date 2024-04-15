@@ -11,10 +11,12 @@ import Index from "./Index";
 import Register from "./Register";
 import Login from "./Login";
 import Home from "./Home";
-import History from "./History";
+import Profile from "./Profile";
+import QrCode from "./QrCode";
 import Transfer from "./Transfer";
 import Topup from "./Topup";
-import Profile from "./Profile";
+import History from "./History";
+import ScanQR from "./ScanQR";
 import Message from "./Message";
 
 const Tab = createBottomTabNavigator();
@@ -114,6 +116,36 @@ const ContainerNavigation = () => {
             component={MyTab}
             options={{ headerShown: false }}
           />
+           <Stack.Screen
+            name="Profile"
+            component={Profile}
+            options={{
+              headerMode: "screen",
+              headerTitle: "",
+              headerStatusBarHeight: -10,
+              headerTintColor: "#FFFFFF",
+            }}
+          />
+           <Stack.Screen
+            name="QrCode"
+            component={QrCode}
+            options={{
+              headerMode: "screen",
+              headerTitle: "",
+              headerStatusBarHeight: -10,
+              headerTintColor: "#FFFFFF",
+            }}
+          />
+          <Stack.Screen
+            name="ScanQR"
+            component={ScanQR}
+            options={{
+              headerMode: "screen",
+              headerTitle: "",
+              headerStatusBarHeight: -10,
+              headerTintColor: "#FFFFFF",
+            }}
+          />
           <Stack.Screen
             name="Transfer"
             component={Transfer}
@@ -127,16 +159,6 @@ const ContainerNavigation = () => {
           <Stack.Screen
             name="Topup"
             component={Topup}
-            options={{
-              headerMode: "screen",
-              headerTitle: "",
-              headerStatusBarHeight: -10,
-              headerTintColor: "#FFFFFF",
-            }}
-          />
-          <Stack.Screen
-            name="Profile"
-            component={Profile}
             options={{
               headerMode: "screen",
               headerTitle: "",

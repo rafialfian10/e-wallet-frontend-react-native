@@ -99,10 +99,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
     padding: 10,
     alignSelf: "center",
-    borderRadius: 10,
+    borderRadius: 5,
     borderColor: "#808080",
     borderWidth: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFFFFF",
     zIndex: 10,
   },
   listUsername: {

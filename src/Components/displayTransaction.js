@@ -1,9 +1,13 @@
-import { StyleSheet, Image, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View, Image, Text, TouchableOpacity } from "react-native";
 
 function DisplayTransaction({ navigation }) {
+
   return (
     <View style={styles.contentTransaction}>
-      <TouchableOpacity style={styles.subContentTransaction}>
+      <TouchableOpacity
+        style={styles.subContentTransaction}
+        onPress={() => navigation.navigate("ScanQR")}
+      >
         <Image
           source={require("../../assets/pay.png")}
           alt="pay"

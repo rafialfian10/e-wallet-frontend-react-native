@@ -126,7 +126,7 @@ const History = () => {
 const styles = StyleSheet.create({
   containerHistory: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFFFFF",
   },
   spinner: {
     marginTop: -80,

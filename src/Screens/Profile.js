@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   containerProfile: {
     flex: 1,
     width: "100%",
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFFFFF",
   },
   spinner: {
     marginTop: -80,
@@ -268,9 +268,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 5,
     borderWidth: 2,
-    borderTopColor: "#F5F5F5",
-    borderLeftColor: "#F5F5F5",
-    borderRightColor: "#F5F5F5",
+    borderTopColor: "#FFFFFF",
+    borderLeftColor: "#FFFFFF",
+    borderRightColor: "#FFFFFF",
     borderBottomColor: "#808080",
   },
   textKey: {

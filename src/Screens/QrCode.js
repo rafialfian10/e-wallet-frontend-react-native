@@ -9,27 +9,16 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import FormPin from "../Components/formPin";
-import ModalTransferSuccess from "../Components/modalTransactionSuccess";
+import ModalGenerateQRCode from "../Components/modalGenerateQrCode";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
-const Topup = ({ navigation }) => {
-  const { user, refetchUser } = GetUser();
+const QrCode = ({ navigation }) => {
+  const { user } = GetUser();
 
   const [activeButton, setActiveButton] = useState({ active: null });
-  const [modalTransferSuccess, setModalTransferSuccess] = useState(false);
-  const [showPinForm, setShowPinForm] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [dataTransferSuccess, setDataTransferSuccess] = useState({
-    visible: false,
-    data: {},
-  });
-  const [form, setForm] = useState({
-    amount: "",
-    pin: "",
-    transactionType: "topup",
-  });
-  const [error, setError] = useState({ amount: "", pin: "" });
+  const [modalGenerateQrCode, setModalGenerateQrCode] = useState(false);
+  const [form, setForm] = useState({ amount: "" });
+  const [error, setError] = useState({ amount: "" });
 
   const handleChange = (name, value) => {
     setForm({
@@ -45,7 +34,7 @@ const Topup = ({ navigation }) => {
     setActiveButton({ active: null });
   };
 
-  const handlePIN = async () => {
+  const handleGenerateQrCode = async () => {
     try {
       const messageError = {
         amount:
@@ -57,7 +46,7 @@ const Topup = ({ navigation }) => {
       };
 
       if (!messageError.amount) {
-        setShowPinForm(true);
+        setModalGenerateQrCode(true);
       } else {
         setError(messageError);
       }
@@ -66,117 +55,106 @@ const Topup = ({ navigation }) => {
     }
   };
 
-  return showPinForm ? (
-    <SafeAreaView style={styles.containerTopup}>
-      <FormPin
-        user={user}
-        refetchUser={refetchUser}
-        form={form}
-        setForm={setForm}
-        error={error}
-        setError={setError}
-        setModalTransactionSuccess={setModalTransferSuccess}
-        setDataTransactionSuccess={setDataTransferSuccess}
-      />
-      <ModalTransferSuccess
+  return modalGenerateQrCode ? (
+    <SafeAreaView style={styles.containerGenerateQrCode}>
+      <ModalGenerateQRCode
         navigation={navigation}
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        modalTransactionSuccess={modalTransferSuccess}
-        setModalTransactionSuccess={setModalTransferSuccess}
-        dataTransactionSuccess={dataTransferSuccess}
+        user={user}
+        modalGenerateQrCode={modalGenerateQrCode}
+        setModalGenerateQrCode={setModalGenerateQrCode}
+        dataGenerateQrCode={form}
       />
     </SafeAreaView>
   ) : (
-    <SafeAreaView style={styles.containerTopup}>
-      <ScrollView style={styles.contentTopup}>
-        <View style={styles.contentTitleTopup}>
-          <Text style={styles.titleTopup}>Topup</Text>
+    <SafeAreaView style={styles.containerGenerateQrCode}>
+      <ScrollView style={styles.contentGenerateQrCode}>
+        <View style={styles.contentTitleGenerateQrCode}>
+          <Text style={styles.titleGenerateQrCode}>Generate QR</Text>
         </View>
         <View style={styles.centeredView}>
-          <View style={styles.contentListTopup}>
+          <View style={styles.contentListGenerateQrCode}>
             <TouchableOpacity
               style={
                 activeButton.active === 0
-                  ? styles.listTopupActive
-                  : styles.listTopup
+                  ? styles.ListGenerateQrCodeActive
+                  : styles.listGenerateQrCode
               }
               onPress={() => {
                 setActiveButton({ active: 0 });
                 setForm({ ...form, amount: "50000" });
               }}
             >
-              <Text style={styles.listTextTopup}>Rp. 50.000</Text>
+              <Text style={styles.listTextGenerateQrCode}>Rp. 50.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 1
-                  ? styles.listTopupActive
-                  : styles.listTopup
+                  ? styles.ListGenerateQrCodeActive
+                  : styles.listGenerateQrCode
               }
               onPress={() => {
                 setActiveButton({ active: 1 });
                 setForm({ ...form, amount: "100000" });
               }}
             >
-              <Text style={styles.listTextTopup}>Rp. 100.000</Text>
+              <Text style={styles.listTextGenerateQrCode}>Rp. 100.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 2
-                  ? styles.listTopupActive
-                  : styles.listTopup
+                  ? styles.ListGenerateQrCodeActive
+                  : styles.listGenerateQrCode
               }
               onPress={() => {
                 setActiveButton({ active: 2 });
                 setForm({ ...form, amount: "200000" });
               }}
             >
-              <Text style={styles.listTextTopup}>Rp. 200.000</Text>
+              <Text style={styles.listTextGenerateQrCode}>Rp. 200.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 3
-                  ? styles.listTopupActive
-                  : styles.listTopup
+                  ? styles.ListGenerateQrCodeActive
+                  : styles.listGenerateQrCode
               }
               onPress={() => {
                 setActiveButton({ active: 3 });
                 setForm({ ...form, amount: "300000" });
               }}
             >
-              <Text style={styles.listTextTopup}>Rp. 300.000</Text>
+              <Text style={styles.listTextGenerateQrCode}>Rp. 300.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 4
-                  ? styles.listTopupActive
-                  : styles.listTopup
+                  ? styles.ListGenerateQrCodeActive
+                  : styles.listGenerateQrCode
               }
               onPress={() => {
                 setActiveButton({ active: 4 });
                 setForm({ ...form, amount: "500000" });
               }}
             >
-              <Text style={styles.listTextTopup}>Rp. 500.000</Text>
+              <Text style={styles.listTextGenerateQrCode}>Rp. 500.000</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={
                 activeButton.active === 5
-                  ? styles.listTopupActive
-                  : styles.listTopup
+                  ? styles.ListGenerateQrCodeActive
+                  : styles.listGenerateQrCode
               }
               onPress={() => {
                 setActiveButton({ active: 5 });
                 setForm({ ...form, amount: "1000000" });
               }}
             >
-              <Text style={styles.listTextTopup}>Rp. 1000.000</Text>
+              <Text style={styles.listTextGenerateQrCode}>Rp. 1000.000</Text>
             </TouchableOpacity>
             <TextInput
-              style={styles.textInputTopup}
+              style={styles.textInputGenerateQrCode}
               keyboardType="numeric"
-              placeholder="Set topup amount"
+              placeholder="Set generate qr code amount"
               onChangeText={(value) => handleChange("amount", value)}
               value={form.amount}
             />
@@ -184,9 +162,12 @@ const Topup = ({ navigation }) => {
               <Text style={styles.errorTopup}>{error.amount}</Text>
             )}
           </View>
-          <View style={styles.contentBtnTopup}>
-            <TouchableOpacity style={styles.btnTopup} onPress={handlePIN}>
-              <Text style={styles.btnTextTopup}>Topup</Text>
+          <View style={styles.contentBtnGenerateQrCode}>
+            <TouchableOpacity
+              style={styles.btnGenerateQrCode}
+              onPress={handleGenerateQrCode}
+            >
+              <Text style={styles.btnTextGenerateQrCode}>Generate QR</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -196,15 +177,15 @@ const Topup = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  containerTopup: {
+  containerGenerateQrCode: {
     flex: 1,
     width: "100%",
     backgroundColor: "#FFFFFF",
   },
-  contentTopup: {
+  contentGenerateQrCode: {
     width: "100%",
   },
-  contentTitleTopup: {
+  contentTitleGenerateQrCode: {
     width: "100%",
     height: 150,
     marginBottom: 30,
@@ -213,7 +194,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     backgroundColor: "#228B22",
   },
-  titleTopup: {
+  titleGenerateQrCode: {
     width: "100%",
     textAlign: "center",
     textAlignVertical: "center",
@@ -226,21 +207,21 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 20,
   },
-  contentListTopup: {
+  contentListGenerateQrCode: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
     flexWrap: "wrap",
   },
-  listTopup: {
+  listGenerateQrCode: {
     width: "30%",
     marginBottom: 15,
     padding: 5,
     borderRadius: 25,
     backgroundColor: "#3CB371",
   },
-  listTextTopup: {
+  listTextGenerateQrCode: {
     width: "100%",
     textAlign: "center",
     textAlignVertical: "center",
@@ -248,7 +229,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#FFFFFF",
   },
-  textInputTopup: {
+  textInputGenerateQrCode: {
     width: "100%",
     height: 50,
     paddingHorizontal: 20,
@@ -266,15 +247,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "red",
   },
-  contentBtnTopup: {
+  contentBtnGenerateQrCode: {
     width: "100%",
     marginTop: 20,
     display: "flex",
     flexDirection: "row",
     justifyContent: "flex-end",
   },
-  btnTopup: {
-    width: 90,
+  btnGenerateQrCode: {
+    width: 120,
     marginHorizontal: 5,
     padding: 10,
     display: "flex",
@@ -283,13 +264,13 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: "#3CB371",
   },
-  btnTextTopup: {
+  btnTextGenerateQrCode: {
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
     textAlignVertical: "center",
   },
-  listTopupActive: {
+  ListGenerateQrCodeActive: {
     width: "30%",
     marginBottom: 15,
     padding: 5,
@@ -299,4 +280,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Topup;
+export default QrCode;

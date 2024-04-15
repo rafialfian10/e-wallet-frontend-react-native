@@ -7,9 +7,8 @@ import DisplayTransaction from "../Components/displayTransaction";
 import DisplayCategory from "../Components/displayCategory";
 import DisplaySwiper from "../Components/displaySwiper";
 import ModalTransactionSuccess from "../Components/modalTransactionSuccess";
-// import RefreshPage from "../Components/refreshPage";
-import { GetUser } from "../Components/Common/Hooks/getUser";
 import RefreshPage from "../Components/refreshPage";
+import { GetUser } from "../Components/Common/Hooks/getUser";
 
 const Home = ({ navigation }) => {
   const { user, refetchUser } = GetUser();
@@ -33,12 +32,12 @@ const Home = ({ navigation }) => {
             <DisplaySaldo user={user} />
             <DisplayTransaction navigation={navigation} />
           </View>
-        </View>
-        <View style={styles.containerCategory}>
-          <DisplayCategory />
-        </View>
-        <View style={styles.containerSwiper}>
-          <DisplaySwiper />
+          <View style={styles.containerCategory}>
+            <DisplayCategory />
+          </View>
+          <View style={styles.containerSwiper}>
+            <DisplaySwiper />
+          </View>
         </View>
       </RefreshPage>
       {modalTopupSuccess && (
@@ -59,7 +58,10 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
   containerHome: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFFFFF",
+  },
+  camera: {
+    flex: 1,
   },
   containerProfile: {
     width: "100%",

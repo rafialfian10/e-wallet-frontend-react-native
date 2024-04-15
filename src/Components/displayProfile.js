@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { FontAwesome } from "@expo/vector-icons";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { Ionicons, FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   StyleSheet,
@@ -75,12 +74,17 @@ function DisplayProfile({ navigation }) {
         )}
         {contentNavigation && (
           <View style={styles.contentNavigation}>
-            <TouchableOpacity onPress={() => {navigation.navigate("Profile"); toggleContentNavigation();}} style={styles.btnProfile}>
+            <TouchableOpacity style={styles.btnProfile} onPress={() => {navigation.navigate("Profile"); toggleContentNavigation();}} >
               <Text style={styles.textBtn}>
                 <FontAwesome6 name="user-large" size={16} color="#000000" />  Profile
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {handleLogout(); toggleContentNavigation();}} style={styles.btnLogout}>
+            <TouchableOpacity style={styles.btnQrCode} onPress={() => {navigation.navigate("QrCode"); toggleContentNavigation();}} >
+              <Text style={styles.textBtn}>
+                <Ionicons name="qr-code-outline" size={16} color="#000000" /> QR Code
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnLogout} onPress={() => {handleLogout(); toggleContentNavigation();}} >
               <Text style={styles.textBtn}>
                 <FontAwesome name="sign-out" size={16} color="#000000" />  Logout
               </Text>
@@ -137,6 +141,12 @@ const styles = StyleSheet.create({
   btnProfile: {
     width: "100%",
     marginBottom: 10,
+  },
+  btnQrCode: {
+    width: "100%",
+    marginBottom: 10,
+    display: "flex",
+    justifyContent: "center",
   },
   btnLogout: {
     width: "100%",

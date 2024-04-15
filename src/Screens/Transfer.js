@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import FormPin from "../Components/formPin";
-import SearchUsername from "../Components/SearchUsername";
+import SearchUsername from "../Components/searchUsername";
 import ModalTransferSuccess from "../Components/modalTransactionSuccess";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   containerTransfer: {
     flex: 1,
     width: "100%",
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFFFFF",
   },
   contentTransfer: {
     width: "100%",
