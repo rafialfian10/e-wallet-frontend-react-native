@@ -25,8 +25,8 @@ function FormPin(props) {
   const [pinCompleted, setPinCompleted] = useState(false);
 
   useEffect(() => {
-    setPinCompleted(form.pin.length === 6);
-  }, [form.pin]);
+    setPinCompleted(form?.pin.length === 6);
+  }, [form?.pin]);
 
   useEffect(() => {
     if (pinCompleted) {
@@ -43,7 +43,7 @@ function FormPin(props) {
         },
       };
 
-      let pinMatches = await bcrypt.compareSync(form?.pin, user?.pin);
+      let pinMatches = bcrypt.compareSync(form?.pin, user?.pin);
 
       const messageError = {
         pin: pinMatches ? "" : "PIN does not match, please try again",
@@ -52,9 +52,9 @@ function FormPin(props) {
       if (pinMatches) {
         const body = JSON.stringify({
           ...form,
-          amount: parseFloat(form.amount),
-          pin: user.pin,
-          otherUserId: form.otherUserId,
+          amount: parseFloat(form?.amount),
+          pin: user?.pin,
+          otherUserId: form?.otherUserId,
         });
 
         let response;
