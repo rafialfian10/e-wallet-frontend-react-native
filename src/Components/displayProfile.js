@@ -74,19 +74,39 @@ function DisplayProfile({ navigation }) {
         )}
         {contentNavigation && (
           <View style={styles.contentNavigation}>
-            <TouchableOpacity style={styles.btnProfile} onPress={() => {navigation.navigate("Profile"); toggleContentNavigation();}} >
+            <TouchableOpacity
+              style={styles.btnProfile}
+              onPress={() => {
+                navigation.navigate("Profile");
+                toggleContentNavigation();
+              }}
+            >
               <Text style={styles.textBtn}>
-                <FontAwesome6 name="user-large" size={16} color="#000000" />  Profile
+                <FontAwesome6 name="user-large" size={16} color="#000000" />{" "}
+                Profile
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnQrCode} onPress={() => {navigation.navigate("QrCode"); toggleContentNavigation();}} >
+            <TouchableOpacity
+              style={styles.btnQrCode}
+              onPress={() => {
+                navigation.navigate("QrCode");
+                toggleContentNavigation();
+              }}
+            >
               <Text style={styles.textBtn}>
-                <Ionicons name="qr-code-outline" size={16} color="#000000" /> QR Code
+                <Ionicons name="qr-code-outline" size={16} color="#000000" /> QR
+                Code
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnLogout} onPress={() => {handleLogout(); toggleContentNavigation();}} >
+            <TouchableOpacity
+              style={styles.btnLogout}
+              onPress={() => {
+                handleLogout();
+                toggleContentNavigation();
+              }}
+            >
               <Text style={styles.textBtn}>
-                <FontAwesome name="sign-out" size={16} color="#000000" />  Logout
+                <FontAwesome name="sign-out" size={16} color="#000000" /> Logout
               </Text>
             </TouchableOpacity>
           </View>
@@ -137,6 +157,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#FFFFFF",
+    elevation: 5,
+    shadowOpacity: 0.75,
+    shadowRadius: 4,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
   },
   btnProfile: {
     width: "100%",

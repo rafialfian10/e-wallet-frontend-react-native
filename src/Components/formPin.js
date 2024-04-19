@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GetTransactionsUser } from "./Common/Hooks/getTransactionsUser";
 import { API } from "../Config/Api";
 
+const bcrypt = require('bcryptjs');
+
 function FormPin(props) {
   const {
     user,
@@ -41,39 +43,34 @@ function FormPin(props) {
         },
       };
 
+      let pinMatches = await bcrypt.compareSync(form?.pin, user?.pin);
+
       const messageError = {
-        pin:
-          form.pin != user?.pin ? "PIN does not match, please try again" : "",
+        pin: pinMatches ? "" : "PIN does not match, please try again",
       };
 
-      if (!messageError.pin) {
+      if (pinMatches) {
         const body = JSON.stringify({
           ...form,
           amount: parseFloat(form.amount),
-          pin: parseInt(form.pin),
+          pin: user.pin,
           otherUserId: form.otherUserId,
         });
 
+        let response;
         if (form.transactionType === "transfer") {
-          const response = await API.post("/transfer", body, config);
-          if (response.data.status === 200) {
-            refetchUser();
-            refetchTransactionsUser();
-            setForm({ amount: "", pin: "", otherUserId: "" });
-            setError({ amount: "", pin: "", otherUserId: "" });
-            setDataTransactionSuccess({ visible: true, data: form });
-            setModalTransactionSuccess(true);
-          }
+          response = await API.post("/transfer", body, config);
         } else {
-          const response = await API.post("/topup", body, config);
-          if (response.data.status === 200) {
-            refetchUser();
-            refetchTransactionsUser();
-            setForm({ amount: "", pin: "", otherUserId: "" });
-            setError({ amount: "", pin: "", otherUserId: "" });
-            setDataTransactionSuccess({ visible: true, data: form });
-            setModalTransactionSuccess(true);
-          }
+          response = await API.post("/topup", body, config);
+        }
+
+        if (response.data.status === 200) {
+          refetchUser();
+          refetchTransactionsUser();
+          setForm({ amount: "", pin: "", otherUserId: "" });
+          setError({ amount: "", pin: "", otherUserId: "" });
+          setDataTransactionSuccess({ visible: true, data: form });
+          setModalTransactionSuccess(true);
         }
       } else {
         setError(messageError);

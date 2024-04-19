@@ -11,6 +11,7 @@ import Index from "./Index";
 import Register from "./Register";
 import Login from "./Login";
 import Home from "./Home";
+import Pin from "./Pin";
 import Profile from "./Profile";
 import QrCode from "./QrCode";
 import Transfer from "./Transfer";
@@ -45,7 +46,13 @@ function MyTab() {
             return <Ionicons name={iconName} size={size} color={color} />;
           } else if (route.name === "Message") {
             iconName = focused ? "message-text" : "message-text-outline";
-            return <MaterialCommunityIcons name={iconName} size={size} color={color} />
+            return (
+              <MaterialCommunityIcons
+                name={iconName}
+                size={size}
+                color={color}
+              />
+            );
           }
         },
         tabBarActiveTintColor: "#003366",
@@ -109,83 +116,105 @@ const ContainerNavigation = () => {
 
   return (
     <>
-      {state.isLogin === true ? (
-        <Stack.Navigator>
-          <Stack.Screen
-            name="MyTab"
-            component={MyTab}
-            options={{ headerShown: false }}
-          />
-           <Stack.Screen
-            name="Profile"
-            component={Profile}
-            options={{
-              headerMode: "screen",
-              headerTitle: "",
-              headerStatusBarHeight: -10,
-              headerTintColor: "#FFFFFF",
-            }}
-          />
-           <Stack.Screen
-            name="QrCode"
-            component={QrCode}
-            options={{
-              headerMode: "screen",
-              headerTitle: "",
-              headerStatusBarHeight: -10,
-              headerTintColor: "#FFFFFF",
-            }}
-          />
-          <Stack.Screen
-            name="ScanQR"
-            component={ScanQR}
-            options={{
-              headerMode: "screen",
-              headerTitle: "",
-              headerStatusBarHeight: -10,
-              headerTintColor: "#FFFFFF",
-            }}
-          />
-          <Stack.Screen
-            name="Transfer"
-            component={Transfer}
-            options={{
-              headerMode: "screen",
-              headerTitle: "",
-              headerStatusBarHeight: -10,
-              headerTintColor: "#FFFFFF",
-            }}
-          />
-          <Stack.Screen
-            name="Topup"
-            component={Topup}
-            options={{
-              headerMode: "screen",
-              headerTitle: "",
-              headerStatusBarHeight: -10,
-              headerTintColor: "#FFFFFF",
-            }}
-          />
-        </Stack.Navigator>
-      ) : (
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Index"
-            component={Index}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={Register}
-            options={{ headerShown: false }}
-          />
-        </Stack.Navigator>
-      )}
+      <Stack.Navigator>
+        {state.isLogin ? (
+          state.user.pin !== null ? (
+            <>
+              <Stack.Screen
+                name="MyTab"
+                component={MyTab}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={Profile}
+                options={{
+                  headerMode: "screen",
+                  headerTitle: "",
+                  headerStatusBarHeight: -10,
+                  headerTintColor: "#FFFFFF",
+                }}
+              />
+              <Stack.Screen
+                name="QrCode"
+                component={QrCode}
+                options={{
+                  headerMode: "screen",
+                  headerTitle: "",
+                  headerStatusBarHeight: -10,
+                  headerTintColor: "#FFFFFF",
+                }}
+              />
+              <Stack.Screen
+                name="ScanQR"
+                component={ScanQR}
+                options={{
+                  headerMode: "screen",
+                  headerTitle: "",
+                  headerStatusBarHeight: -10,
+                  headerTintColor: "#FFFFFF",
+                }}
+              />
+              <Stack.Screen
+                name="Transfer"
+                component={Transfer}
+                options={{
+                  headerMode: "screen",
+                  headerTitle: "",
+                  headerStatusBarHeight: -10,
+                  headerTintColor: "#FFFFFF",
+                }}
+              />
+              <Stack.Screen
+                name="Topup"
+                component={Topup}
+                options={{
+                  headerMode: "screen",
+                  headerTitle: "",
+                  headerStatusBarHeight: -10,
+                  headerTintColor: "#FFFFFF",
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="Pin"
+                component={Pin}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="Home"
+                component={Home}
+                options={{
+                  headerMode: "screen",
+                  headerTitle: "",
+                  headerStatusBarHeight: -10,
+                  headerTintColor: "#FFFFFF",
+                }}
+              />
+            </>
+          )
+        ) : (
+          <>
+            <Stack.Screen
+              name="Index"
+              component={Index}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Register"
+              component={Register}
+              options={{ headerShown: false }}
+            />
+          </>
+        )}
+      </Stack.Navigator>
     </>
   );
 };

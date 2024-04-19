@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { OtpInput } from "react-native-otp-entry";
 import {
   StyleSheet,
@@ -8,8 +9,11 @@ import {
 } from "react-native";
 
 import { API } from "../Config/Api";
+import { UserContext } from "../Context/UserContext";
 
-function FormRegister4({ navigation, form, setForm, error, setError }) {
+function FormConfirmPin({ navigation, form, setForm, error, setError }) {
+  const [state, dispatch] = useContext(UserContext);
+
   const handleSubmit = async () => {
     try {
       const config = {
@@ -20,33 +24,28 @@ function FormRegister4({ navigation, form, setForm, error, setError }) {
 
       const messageError = {
         confirmPin: form.pin !== form.confirmPin ? "PIN not valid" : "",
-        
       };
 
       if (!messageError.confirmPin) {
         const body = JSON.stringify(form);
 
         try {
-          const response = await API.post("/register", body, config);
-          if (response?.data?.status === 201) {
-            alert("Register successfully");
+          const response = await API.patch(
+            `/user/${state?.user?.id}`,
+            body,
+            config
+          );
+          if (response?.data?.status === 200) {
+            alert("Pin successfully created");
             setForm({
-              username: "",
-              email: "",
-              password: "",
-              phone: "",
               pin: "",
               confirmPin: "",
             });
             setError({
-              username: "",
-              email: "",
-              password: "",
-              phone: "",
               pin: "",
               confirmPin: "",
             });
-            navigation.navigate("Login");
+            navigation.navigate("Home");
           }
         } catch (error) {
           if (error.response && error.response.status === 400) {
@@ -59,7 +58,7 @@ function FormRegister4({ navigation, form, setForm, error, setError }) {
         setError(messageError);
       }
     } catch (error) {
-      console.log("register failed", error);
+      console.log("update user failed", error);
     }
   };
 
@@ -73,6 +72,7 @@ function FormRegister4({ navigation, form, setForm, error, setError }) {
         focusColor="#000000"
         focusStickBlinkingDuration={500}
         autoFocus
+        // secureTextEntry={true}
         theme={{
           // containerStyle: styles.container,
           // inputsContainerStyle: styles.inputsContainer,
@@ -82,20 +82,12 @@ function FormRegister4({ navigation, form, setForm, error, setError }) {
           focusedPinCodeContainerStyle: styles.activePinCodeContainer,
         }}
       />
-      {error.confirmPin && <Text style={styles.errorPIN}>{error.confirmPin}</Text>}
+      {error.confirmPin && (
+        <Text style={styles.errorPIN}>{error.confirmPin}</Text>
+      )}
       <TouchableOpacity onPress={handleSubmit} style={styles.btn}>
-        <Text style={styles.btnText}>Register</Text>
+        <Text style={styles.btnText}>Confirm PIN</Text>
       </TouchableOpacity>
-      <Text style={styles.textLogin}>
-        Joined us before?
-        <Text
-          onPress={() => navigation.navigate("Login")}
-          style={styles.linkLogin}
-        >
-          {" "}
-          Login
-        </Text>
-      </Text>
     </View>
   );
 }
@@ -122,6 +114,7 @@ const styles = StyleSheet.create({
   errorPIN: {
     width: "100%",
     marginTop: 10,
+    paddingHorizontal: 8,
     alignSelf: "center",
     textAlign: "left",
     textAlignVertical: "center",
@@ -131,7 +124,7 @@ const styles = StyleSheet.create({
   btn: {
     width: "100%",
     height: 50,
-    marginTop: 110,
+    marginTop: 380,
     padding: 10,
     display: "flex",
     alignSelf: "center",
@@ -144,15 +137,6 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textAlign: "center",
   },
-  textLogin: {
-    marginTop: 5,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  linkLogin: {
-    color: "#3CB371",
-    fontWeight: "800",
-  },
 });
 
-export default FormRegister4;
+export default FormConfirmPin;

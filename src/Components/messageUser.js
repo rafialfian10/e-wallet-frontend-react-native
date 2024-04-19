@@ -19,7 +19,7 @@ function MessageUser({ showChat, setShowChat }) {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io("http://192.168.45.106:5000", {
+    socket = io("http://192.168.43.232:5000", {
       auth: {
         token: AsyncStorage.getItem("token"),
       },

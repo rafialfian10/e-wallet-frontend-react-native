@@ -9,7 +9,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const FormRegister1 = ({ form, setForm, error, setError }) => {
+const FormRegister1 = ({
+  form,
+  setForm,
+  error,
+  setError,
+}) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleTogglePassword = () => {
@@ -87,9 +92,7 @@ const FormRegister1 = ({ form, setForm, error, setError }) => {
           onChangeText={(value) => handleChange("email", value)}
           value={form.email}
         />
-        {error.email && (
-          <Text style={styles.errorRegister}>{error.email}</Text>
-        )}
+        {error.email && <Text style={styles.errorRegister}>{error.email}</Text>}
       </View>
       <View style={styles.contentInput}>
         <TextInput
@@ -144,36 +147,11 @@ const styles = StyleSheet.create({
   },
   errorRegister: {
     width: "100%",
-    paddingHorizontal: 10,
+    paddingHorizontal: 13,
     alignSelf: "center",
     textAlign: "justify",
     fontSize: 11,
     color: "red",
-  },
-  btn: {
-    width: "75%",
-    height: 50,
-    padding: 10,
-    display: "flex",
-    alignSelf: "center",
-    justifyContent: "center",
-    borderRadius: 50,
-    marginTop: 20,
-    backgroundColor: "#3CB371",
-  },
-  btnText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
-    textAlign: "center",
-  },
-  textLogin: {
-    marginTop: 5,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  linkLogin: {
-    color: "#3CB371",
-    fontWeight: "800",
   },
 });
 

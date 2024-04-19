@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { AntDesign } from "@expo/vector-icons";
 import {
@@ -14,33 +14,28 @@ import DisplayLogo from "../Components/displayLogo";
 import FormRegister1 from "../Components/formRegister1";
 import FormRegister2 from "../Components/formRegister2";
 import FormRegister3 from "../Components/formRegister3";
-import FormRegister4 from "../Components/formRegister4";
 
-const Register = ({ navigation }) => {
+const Register = ({ navigation, route }) => {
   const [screen, setScreen] = useState(0);
   const formTitle = [
     "Enter Personal Data",
     "Enter Phone Number",
-    "Create PIN",
-    "Confirm PIN",
+    "One Time Password (OTP) has been sent to your email",
   ];
   const [form, setForm] = useState({
     username: "",
     email: "",
     password: "",
     phone: "",
-    pin: "",
-    confirmPin: "",
+    otp: "",
   });
   const [error, setError] = useState({
     username: "",
     email: "",
     password: "",
     phone: "",
-    pin: "",
-    confirmPin: "",
+    otp: "",
   });
-  console.log(error);
 
   const screenDisplay = () => {
     if (screen === 0) {
@@ -55,24 +50,17 @@ const Register = ({ navigation }) => {
     } else if (screen === 1) {
       return (
         <FormRegister2
+          navigation={navigation}
           form={form}
           setForm={setForm}
           error={error}
           setError={setError}
+          setScreen={setScreen}
         />
       );
     } else if (screen === 2) {
       return (
         <FormRegister3
-          form={form}
-          setForm={setForm}
-          error={error}
-          setError={setError}
-        />
-      );
-    } else if (screen === 3) {
-      return (
-        <FormRegister4
           navigation={navigation}
           form={form}
           setForm={setForm}
@@ -82,6 +70,12 @@ const Register = ({ navigation }) => {
       );
     }
   };
+
+  useEffect(() => {
+    if (route.params?.screen) {
+      setScreen(route.params.screen === "FormRegister3" ? 2 : 0);
+    }
+  }, [route.params?.screen]);
 
   const validateForm = () => {
     let isValid = true;
@@ -114,16 +108,6 @@ const Register = ({ navigation }) => {
       } else {
         newErrors.phone = "";
       }
-    } else if (screen === 2) {
-      if (form.pin.trim() === "") {
-        newErrors.pin = "PIN is required";
-        isValid = false;
-      } else if (form.pin.length !== 6) {
-        newErrors.pin = "PIN must be 6 characters long";
-        isValid = false;
-      } else {
-        newErrors.pin = "";
-      }
     }
 
     setError(newErrors);
@@ -136,6 +120,10 @@ const Register = ({ navigation }) => {
     }
   };
 
+  const handlePrev = () => {
+    setScreen((currScreen) => currScreen - 1);
+  };
+
   return (
     <SafeAreaView style={styles.containerRegister}>
       <LinearGradient
@@ -146,15 +134,10 @@ const Register = ({ navigation }) => {
       >
         <ScrollView style={styles.contentRegister}>
           <View style={styles.contentNavigationRegister}>
-            <Pressable
-              disabled={screen === 0}
-              onPress={() => {
-                setScreen((currScreen) => currScreen - 1);
-              }}
-            >
+            <Pressable disabled={screen === 0} onPress={handlePrev}>
               <AntDesign name="left" size={26} color="#000000" />
             </Pressable>
-            <Pressable disabled={screen === 3} onPress={handleNext}>
+            <Pressable disabled={screen === 2} onPress={handleNext}>
               <AntDesign name="right" size={26} color="#000000" />
             </Pressable>
           </View>

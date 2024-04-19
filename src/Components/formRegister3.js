@@ -1,22 +1,71 @@
+import validator from "validator";
 import { OtpInput } from "react-native-otp-entry";
 import {
   StyleSheet,
   View,
   Text,
+  TextInput,
   Keyboard,
 } from "react-native";
 
-function FormRegister3({ form, setForm, error, setError }) {
+import BtnResendOtp from "./btnResendOtp";
+import BtnVerifyOtp from "./btnVerifyOtp";
+
+function FormRegister3({ navigation, form, setForm, error, setError }) {
+  const handleChange = (data, value) => {
+    setForm({
+      ...form,
+      [data]: value,
+    });
+
+    if (data === "email") {
+      if (value.trim() === "") {
+        setError((prevError) => ({
+          ...prevError,
+          email: "Email is required",
+        }));
+      } else if (!validator.isEmail(value)) {
+        setError((prevError) => ({
+          ...prevError,
+          email: "Please enter a valid email address",
+        }));
+      } else {
+        setError((prevError) => ({
+          ...prevError,
+          email: "",
+        }));
+      }
+    }
+
+    if (data === "otp") {
+      setError((prevError) => ({
+        ...prevError,
+        otp: value.trim() === "" ? "Otp is required" : "",
+      }));
+    }
+  };
+
   return (
     <View style={styles.subContentInput} onTouchStart={Keyboard.dismiss}>
+      <View style={styles.contentInput}>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Email..."
+          onChangeText={(value) => handleChange("email", value)}
+          value={form.email}
+        />
+        {error.email && (
+          <Text style={styles.errorVerifyOtp}>{error.email}</Text>
+        )}
+      </View>
       <OtpInput
         numberOfDigits={6}
-        onTextChange={(pin) => {
-          setForm({ ...form, pin });
+        onTextChange={(otp) => {
+          setForm({ ...form, otp });
         }}
         focusColor="#000000"
         focusStickBlinkingDuration={500}
-        autoFocus
+        autoFocus={false}
         theme={{
           // containerStyle: styles.container,
           // inputsContainerStyle: styles.inputsContainer,
@@ -26,7 +75,13 @@ function FormRegister3({ form, setForm, error, setError }) {
           focusedPinCodeContainerStyle: styles.activePinCodeContainer,
         }}
       />
-      {error.pin && <Text style={styles.errorPIN}>{error.pin}</Text>}
+      {error.otp && (
+        <Text style={styles.errorVerifyOtp}>{error.otp}</Text>
+      )}
+      <View style={styles.contentBtnVerifyOtp}>
+        <BtnVerifyOtp navigation={navigation} form={form} setForm={setForm} setError={setError} />
+        <BtnResendOtp form={form} setError={setError} />
+      </View>
     </View>
   );
 }
@@ -34,6 +89,21 @@ function FormRegister3({ form, setForm, error, setError }) {
 const styles = StyleSheet.create({
   subContentInput: {
     width: "100%",
+  },
+  contentInput: {
+    width: "100%",
+    marginBottom: 30,
+    overflow: "hidden",
+  },
+  textInput: {
+    width: "100%",
+    height: 50,
+    paddingHorizontal: 20,
+    alignSelf: "center",
+    justifyContent: "center",
+    borderRadius: 25,
+    color: "#808080",
+    backgroundColor: "#FFFFFF",
   },
   pinCodeContainer: {
     borderColor: "#808080",
@@ -50,14 +120,19 @@ const styles = StyleSheet.create({
     borderColor: "#808080",
     borderWidth: 1,
   },
-  errorPIN: {
+  errorVerifyOtp: {
     width: "100%",
-    marginTop: 10,
+    paddingHorizontal: 8,
     alignSelf: "center",
-    textAlign: "left",
-    textAlignVertical: "center",
+    textAlign: "justify",
     fontSize: 11,
     color: "red",
+  },
+  contentBtnVerifyOtp: {
+    width: "100%",
+    marginTop: 50,
+    borderRadius: 25,
+    overflow: "hidden",
   },
 });
 

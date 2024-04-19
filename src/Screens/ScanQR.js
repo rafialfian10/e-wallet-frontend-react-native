@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { CameraView, useCameraPermissions } from "expo-camera/next";
 import {
   SafeAreaView,
@@ -19,6 +19,7 @@ function ScanQR() {
   };
 
   if (!permission) {
+    console.log("camera error");
     return;
   }
 
@@ -39,13 +40,14 @@ function ScanQR() {
       <CameraView
         style={styles.cameraView}
         facing={facing}
-        ratio="16:9"
+        // ratio="16:9"
         barcodeScannerSettings={{
           barCodeTypes: ["qr"],
           interval: 10,
         }}
-        barCodeSize={{ width: 500, height: 500 }}
-        onBarcodeScanned={handleBarCodeScanned}
+        // barCodeSize={{ width: 500, height: 500 }}
+        // onBarcodeScanned={handleBarCodeScanned}
+        flash="on"
       >
         <View style={styles.contentBtnCamera}>
           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>

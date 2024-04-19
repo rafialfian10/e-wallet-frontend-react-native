@@ -85,8 +85,13 @@ const Login = ({ navigation }) => {
             Alert.alert("", "Login successfully");
           }
         } catch (error) {
-          if (error.response && error.response.status === 400 || error.response.status === 404) {
-            Alert.alert("", "Login failed, wrong email or password");
+          if (error.response && error.response.status === 400) {
+            alert("Email not registered");
+          } else if (error.response && error.response.status === 404) {
+            alert(error.response.data.message);
+          } else if (error.response && error.response.status === 401) {
+            alert(error.response.data.message);
+            navigation.navigate("Register", { screen: "FormRegister3" });
           } else {
             throw error;
           }
