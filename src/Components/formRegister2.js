@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   contentBtnRegister: {
     width: "100%",
-    marginTop: 130,
+    marginTop: 135,
     borderRadius: 25,
     overflow: "hidden",
   },

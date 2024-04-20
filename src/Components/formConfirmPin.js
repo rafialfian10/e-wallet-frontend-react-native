@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   btn: {
     width: "100%",
     height: 50,
-    marginTop: 350,
+    marginTop: 355,
     padding: 10,
     display: "flex",
     alignSelf: "center",

@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { CameraView, useCameraPermissions } from "expo-camera/next";
+import { useState, useEffect } from "react";
+import { Camera } from "expo-camera";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import {
   SafeAreaView,
   StyleSheet,
@@ -10,7 +11,12 @@ import {
 
 function ScanQR() {
   const [facing, setFacing] = useState("back");
-  const [permission, requestPermission] = useCameraPermissions();
+  const [permission, setPermission] = useCameraPermissions();
+
+  // Use Reducer
+  // const [permission, setPermission] = useState(null);
+  // const [state, dispatch] = useReducer(reducer, initialState);
+  // const { cameraType, whbalance, flash, zoomValue } = state;
 
   const handleBarCodeScanned = ({ type, data }) => {
     console.log(
@@ -18,14 +24,21 @@ function ScanQR() {
     );
   };
 
-  if (!permission) {
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setPermission(status === "granted");
+    })();
+  }, []);
+
+  if (permission === null) {
     console.log("camera error");
     return;
   }
 
-  if (!permission?.granted) {
+  if (!permission) {
     return (
-      <Text style={{ textAlign: "center" }}>
+      <Text style={styles.textCameraPermission}>
         We need your permission to show the camera
       </Text>
     );
@@ -40,18 +53,20 @@ function ScanQR() {
       <CameraView
         style={styles.cameraView}
         facing={facing}
-        // ratio="16:9"
+        focusable={true}
+        flash="on"
+        onBarcodeScanned={handleBarCodeScanned}
         barcodeScannerSettings={{
-          barCodeTypes: ["qr"],
+          barcodeTypes: ["qr"],
           interval: 10,
         }}
-        // barCodeSize={{ width: 500, height: 500 }}
-        // onBarcodeScanned={handleBarCodeScanned}
-        flash="on"
       >
-        <View style={styles.contentBtnCamera}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
+        <View style={styles.contentBtnFlipCamera}>
+          <TouchableOpacity
+            style={styles.btnFlipCamera}
+            onPress={toggleCameraFacing}
+          >
+            <Text style={styles.textBtnFlipCamera}>Flip Camera</Text>
           </TouchableOpacity>
         </View>
       </CameraView>
@@ -66,22 +81,32 @@ const styles = StyleSheet.create({
   },
   cameraView: {
     flex: 1,
+    borderColor: "red",
+    borderWidth: 10,
   },
-  contentBtnCamera: {
-    flex: 1,
+  contentBtnFlipCamera: {
+    position: "absolute",
+    bottom: 0,
+    display: "flex",
     flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "transparent",
-    margin: 64,
   },
-  button: {
+  btnFlipCamera: {
     flex: 1,
     alignSelf: "flex-end",
     alignItems: "center",
   },
-  text: {
+  textBtnFlipCamera: {
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
+  },
+  textCameraPermission: {
+    flex: 1,
+    textAlign: "center",
+    textAlignVertical: "center",
   },
 });
 

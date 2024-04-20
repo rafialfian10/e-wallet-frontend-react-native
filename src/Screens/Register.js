@@ -134,10 +134,10 @@ const Register = ({ navigation, route }) => {
       >
         <ScrollView style={styles.contentRegister}>
           <View style={styles.contentNavigationRegister}>
-            <Pressable disabled={screen === 0} onPress={handlePrev}>
+            <Pressable style={{ opacity: screen === 0 || screen === 2 ? 0 : 1 }} disabled={screen === 0} onPress={handlePrev}>
               <AntDesign name="left" size={26} color="#000000" />
             </Pressable>
-            <Pressable disabled={screen === 2} onPress={handleNext}>
+            <Pressable style={{ opacity: screen === 1 || screen === 2 ? 0 : 1 }} disabled={screen === 1} onPress={handleNext}>
               <AntDesign name="right" size={26} color="#000000" />
             </Pressable>
           </View>
