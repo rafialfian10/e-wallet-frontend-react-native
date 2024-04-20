@@ -5,9 +5,9 @@ import { StyleSheet, Text, View } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chats";
+import RefreshPage from "./refreshPage";
 import { SOCKET_SERVER } from "@env";
 import { UserContext } from "../Context/UserContext";
-import RefreshPage from "./refreshPage";
 
 function MessageAdmin({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);
@@ -19,7 +19,7 @@ function MessageAdmin({ showChat, setShowChat }) {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    socket = io("http://192.168.43.232:5000", {
+    socket = io(SOCKET_SERVER, {
       auth: {
         token: AsyncStorage.getItem("token"),
       },

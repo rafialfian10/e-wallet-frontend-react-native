@@ -2,8 +2,8 @@ import axios from "axios";
 import { API_URL } from "@env";
 
 export const API = axios.create({
-  baseURL: "http://192.168.43.232:5000/api/v1",
-  // baseURL: API_URL,
+  // baseURL: "http://192.168.43.232:5000/api/v1",
+  baseURL: API_URL,
 });
 
 export const setAuthToken = (token) => {

@@ -225,12 +225,12 @@ const styles = StyleSheet.create({
   btn: {
     width: "75%",
     height: 50,
+    marginTop: 30,
     padding: 10,
     display: "flex",
     alignSelf: "center",
     justifyContent: "center",
     borderRadius: 50,
-    marginTop: 20,
     backgroundColor: "#3cb371",
   },
   btnText: {

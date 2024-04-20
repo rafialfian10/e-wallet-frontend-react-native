@@ -106,17 +106,17 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   containerInput: {
-    width: "85%",
+    width: "75%",
     alignSelf: "center",
   },
   formTitle: {
-    width: "75%",
+    width: "100%",
     marginVertical: 25,
     alignSelf: "center",
     textAlign: "center",
     textAlignVertical: "center",
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "700",
     color: "#808080",
   },
 });

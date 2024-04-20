@@ -97,6 +97,8 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   pinCodeContainer: {
+    width: 40,
+    height: 50,
     borderColor: "#808080",
     borderWidth: 1,
   },
@@ -113,8 +115,8 @@ const styles = StyleSheet.create({
   },
   errorPIN: {
     width: "100%",
-    marginTop: 10,
-    paddingHorizontal: 8,
+    marginTop: 5,
+    paddingHorizontal: 5,
     alignSelf: "center",
     textAlign: "left",
     textAlignVertical: "center",
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
   btn: {
     width: "100%",
     height: 50,
-    marginTop: 380,
+    marginTop: 350,
     padding: 10,
     display: "flex",
     alignSelf: "center",

@@ -2,7 +2,7 @@ import { StyleSheet, TouchableOpacity, Text } from "react-native";
 
 import { API } from "../Config/Api";
 
-function BtnResendOtp({ form, setError }) {
+function BtnResendOtp({ form, setError, setExpiryTime }) {
   const handleResendOtp = async () => {
     try {
       const config = {
@@ -20,8 +20,9 @@ function BtnResendOtp({ form, setError }) {
 
         try {
           const response = await API.post("/resend-otp", body, config);
-          if(response.status === 200) {
-            console.log(response.data.data)
+          if (response.status === 200) {
+            setExpiryTime(response.data.data.ttl);
+            console.log(response.data.message);
           }
         } catch (error) {
           if (error.response && error.response.status === 404) {
