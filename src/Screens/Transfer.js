@@ -26,12 +26,17 @@ const Transfer = ({ navigation }) => {
     data: {},
   });
   const [form, setForm] = useState({
+    otherUserId: "",
     amount: "",
+    transactionType: "transfer",
+    pin: "",
+  });
+  const [error, setError] = useState({
+    amount: "",
+    balance: "",
     pin: "",
     otherUserId: "",
-    transactionType: "transfer",
   });
-  const [error, setError] = useState({ amount: "", pin: "", otherUserId: "" });
 
   const handleChange = (name, value) => {
     setForm({

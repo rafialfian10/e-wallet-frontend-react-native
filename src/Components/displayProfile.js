@@ -53,7 +53,7 @@ function DisplayProfile({ navigation }) {
 
   return (
     <View style={styles.contentProfile}>
-      <Text style={styles.textProfile}>Hi {user?.username}</Text>
+      <Text style={styles.textProfile}>Hi {user?.username?.split(" ")[0]}</Text>
       <Pressable
         style={styles.contentPhoto}
         onPress={() => setShowContentNavigation(!contentNavigation)}
@@ -89,7 +89,7 @@ function DisplayProfile({ navigation }) {
             <TouchableOpacity
               style={styles.btnQrCode}
               onPress={() => {
-                navigation.navigate("QrCode");
+                navigation.navigate("GenerateQrCode");
                 toggleContentNavigation();
               }}
             >

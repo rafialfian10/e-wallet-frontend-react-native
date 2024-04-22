@@ -17,8 +17,10 @@ function ModalGenerateQRCode(props) {
     : "0,00";
 
   const qrCode = {
-    id: user?.id,
+    otherUserId: user?.id,
     amount: dataGenerateQrCode?.amount,
+    transactionType: "transfer",
+    pin: "",
   };
 
   return (

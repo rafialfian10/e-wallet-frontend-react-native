@@ -13,7 +13,7 @@ import Login from "./Login";
 import Home from "./Home";
 import Pin from "./Pin";
 import Profile from "./Profile";
-import QrCode from "./QrCode";
+import GenerateQrCode from "./GenerateQrCode";
 import Transfer from "./Transfer";
 import Topup from "./Topup";
 import History from "./History";
@@ -100,7 +100,7 @@ const ContainerNavigation = () => {
         payload: {},
       });
       setIsLoading(false);
-      console.log(err);
+      console.log("Unauthorized: ", err);
     }
   };
 
@@ -136,8 +136,8 @@ const ContainerNavigation = () => {
                 }}
               />
               <Stack.Screen
-                name="QrCode"
-                component={QrCode}
+                name="GenerateQrCode"
+                component={GenerateQrCode}
                 options={{
                   headerMode: "screen",
                   headerTitle: "",

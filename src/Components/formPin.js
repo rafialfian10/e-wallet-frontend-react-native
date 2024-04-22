@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GetTransactionsUser } from "./Common/Hooks/getTransactionsUser";
 import { API } from "../Config/Api";
 
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 
 function FormPin(props) {
   const {
@@ -54,11 +54,17 @@ function FormPin(props) {
           ...form,
           amount: parseFloat(form?.amount),
           pin: user?.pin,
-          otherUserId: form?.otherUserId,
+          otherUserId: form?.id,
         });
 
         let response;
         if (form.transactionType === "transfer") {
+          if (user.balance.balance < form.amount) {
+            setError({
+              balance: `Balance is not sufficient, your remaining balance is`,
+            });
+            return;
+          }
           response = await API.post("/transfer", body, config);
         } else {
           response = await API.post("/topup", body, config);
@@ -67,8 +73,18 @@ function FormPin(props) {
         if (response.data.status === 200) {
           refetchUser();
           refetchTransactionsUser();
-          setForm({ amount: "", pin: "", otherUserId: "" });
-          setError({ amount: "", pin: "", otherUserId: "" });
+          setForm({
+            amount: "",
+            pin: "",
+            otherUserId: "",
+            transactionType: "",
+          });
+          setError({
+            amount: "",
+            balance: "",
+            pin: "",
+            otherUserId: "",
+          });
           setDataTransactionSuccess({ visible: true, data: form });
           setModalTransactionSuccess(true);
         }
@@ -94,6 +110,12 @@ function FormPin(props) {
         autoFocus
       />
       {error.pin && <Text style={styles.errorPIN}>{error.pin}</Text>}
+      {error.balance && (
+        <Text style={styles.errorPIN}>
+          {error.balance}{" "}
+          <Text style={styles.textErrorBalance}>{user?.balance.balance}</Text>
+        </Text>
+      )}
     </View>
   );
 }
@@ -107,7 +129,6 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F5F5F5",
   },
   enterPIN: {
     marginBottom: 5,
@@ -122,12 +143,16 @@ const styles = StyleSheet.create({
   },
   errorPIN: {
     width: "100%",
-    marginTop: 20,
+    marginTop: 10,
     alignSelf: "center",
     textAlign: "center",
     textAlignVertical: "center",
     fontSize: 14,
     color: "red",
+  },
+  textErrorBalance: {
+    fontWeight: "700",
+    textDecorationLine: "underline",
   },
 });
 

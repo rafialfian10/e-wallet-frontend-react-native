@@ -12,7 +12,7 @@ import {
 import ModalGenerateQRCode from "../Components/modalGenerateQrCode";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
-const QrCode = ({ navigation }) => {
+const GenerateQrCode = ({ navigation }) => {
   const { user } = GetUser();
 
   const [activeButton, setActiveButton] = useState({ active: null });
@@ -280,4 +280,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QrCode;
+export default GenerateQrCode;
