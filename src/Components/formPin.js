@@ -54,7 +54,7 @@ function FormPin(props) {
           ...form,
           amount: parseFloat(form?.amount),
           pin: user?.pin,
-          otherUserId: form?.id,
+          otherUserId: form?.otherUserId,
         });
 
         let response;

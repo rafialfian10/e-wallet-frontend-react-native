@@ -1,6 +1,7 @@
-import { useState, useRef, useReducer } from "react";
+import { useState, useEffect, useRef, useReducer } from "react";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Camera, FlashMode } from "expo-camera";
+import { Camera, CameraView } from "expo-camera/next";
+import { FlashMode } from "expo-camera";
 import Slider from "@react-native-community/slider";
 import {
   StyleSheet,
@@ -11,20 +12,22 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Image,
+  Alert,
 } from "react-native";
 
 import FormPin from "../Components/formPin";
 import ModalTransferSuccess from "../Components/modalTransactionSuccess";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
-const cameraEffects = [
-  { id: "auto", property: "Auto" },
-  { id: "sunny", property: "Sunny" },
-  { id: "cloudy", property: "Cloudy" },
-  { id: "shadow", property: "Shadow" },
-  { id: "incandescent", property: "Incandescent" },
-  { id: "fluorescent", property: "Fluorescent" },
-];
+// const cameraEffects = [
+//   { id: "auto", property: "Auto" },
+//   { id: "sunny", property: "Sunny" },
+//   { id: "cloudy", property: "Cloudy" },
+//   { id: "shadow", property: "Shadow" },
+//   { id: "incandescent", property: "Incandescent" },
+//   { id: "fluorescent", property: "Fluorescent" },
+// ];
 
 const initialState = {
   zoomValue: 0,
@@ -55,12 +58,8 @@ function reducer(state = initialState, action) {
 export default function ScanQR({ navigation }) {
   const { user, refetchUser } = GetUser();
 
-  const [permission, requestPermission] = Camera.useCameraPermissions();
-
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const { zoomValue, whiteBalance, cameraType, flash } = state;
-  const camera = useRef(null);
-
+  const [permission, setPermission] = useState(null);
+  const [scanned, setScanned] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTransferSuccess, setModalTransferSuccess] = useState(false);
   const [dataTransferSuccess, setDataTransferSuccess] = useState({
@@ -69,6 +68,19 @@ export default function ScanQR({ navigation }) {
   });
   const [form, setForm] = useState(null);
   const [error, setError] = useState({ pin: "", balance: "" });
+
+  useEffect(() => {
+    const getCameraPermissions = async () => {
+      const cameraPermission = await Camera.requestCameraPermissionsAsync();
+      setPermission(cameraPermission);
+    };
+
+    getCameraPermissions();
+  }, []);
+
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { zoomValue, whiteBalance, cameraType, flash } = state;
+  const camera = useRef(null);
 
   if (!permission) {
     return <View />;
@@ -83,7 +95,36 @@ export default function ScanQR({ navigation }) {
   }
 
   const handleScanQR = (data) => {
-    setForm(JSON.parse(data.data))
+    setScanned(true);
+    if (data.data !== null) {
+      try {
+        const qrCodeData = JSON.parse(data.data);
+
+        // Checks whether all the desired keys are present in the object
+        const expectedKeys = [
+          "amount",
+          "transactionType",
+          "pin",
+          "otherUserId",
+        ];
+        const hasAllKeys = expectedKeys.every((key) =>
+          qrCodeData.hasOwnProperty(key)
+        );
+
+        if (hasAllKeys) {
+          setForm(qrCodeData);
+        } else {
+          throw new Error("Failed to scan, invalid QR code format");
+        }
+      } catch (error) {
+        Alert.alert("", "Failed to scan, invalid QR code format", [
+          {
+            text: "Tap to Scan Again",
+            onPress: () => setScanned(false),
+          },
+        ]);
+      }
+    }
   };
 
   const handleToggleFlipCamera = () => {
@@ -102,15 +143,15 @@ export default function ScanQR({ navigation }) {
     }
   };
 
-  const handleWhiteBalance = (value) => {
-    if (value.length > 0) {
-      dispatch({ type: "@type/WH_BALANCE", payload: value });
-    }
-  };
-
   const zoomEffect = (value) => {
     dispatch({ type: "@type/ZOOM", payload: value });
   };
+
+  // const handleWhiteBalance = (value) => {
+  //   if (value.length > 0) {
+  //     dispatch({ type: "@type/WH_BALANCE", payload: value });
+  //   }
+  // };
 
   return form !== null ? (
     <SafeAreaView style={styles.containerScanQr}>
@@ -136,67 +177,78 @@ export default function ScanQR({ navigation }) {
   ) : (
     <SafeAreaView style={styles.containerScanQr}>
       <StatusBar />
-      <Camera
-        style={styles.cameraView}
-        ref={camera}
-        ratio="16:9"
-        autoFocus={true}
-        zoom={zoomValue}
-        whiteBalance={whiteBalance}
-        type={cameraType}
-        flashMode={flash}
-        onBarCodeScanned={(data) => handleScanQR(data)}
-      >
-        <View style={styles.contentZoomSlider}>
-          <Slider
-            onValueChange={zoomEffect}
-            style={styles.zoomSlider}
-            minimumValue={0}
-            maximumValue={1}
-            minimumTrackTintColor="#FFFFFF"
-            maximumTrackTintColor="#808080"
-          />
-        </View>
-        <View style={styles.contentCameraOption}>
-          <View style={styles.cameraOption}>
-            <View style={styles.contentCameraEffects}>
-              <ScrollView horizontal={true}>
-                {cameraEffects?.map((cameraEffect) => (
-                  <TouchableWithoutFeedback
-                    onPress={() => handleWhiteBalance(cameraEffect?.id)}
-                    key={cameraEffect?.id}
-                  >
-                    <View style={styles.itemCameraEffect}>
-                      <Text style={styles.textItemCameraEffect}>
-                        {cameraEffect?.property}
-                      </Text>
-                    </View>
-                  </TouchableWithoutFeedback>
-                ))}
-              </ScrollView>
-            </View>
-            <View style={styles.contentCameraIcon}>
-              <TouchableOpacity onPress={handleToggleFlipCamera}>
-                <MaterialCommunityIcons
-                  name="camera-flip"
-                  size={24}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleToggleFlash}>
-                <MaterialCommunityIcons
-                  name={flash === "on" ? "flashlight" : "flashlight-off"}
-                  size={24}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+      <View style={styles.contentCamera}>
+        <Image
+          source={require("../../assets/scan-code.png")}
+          style={styles.scanQr}
+          alt="scan-qr"
+        />
+        <CameraView
+          style={styles.cameraView}
+          ref={camera}
+          autoFocus={true}
+          zoom={zoomValue}
+          facing={cameraType}
+          flash={FlashMode.on}
+          onBarcodeScanned={scanned ? undefined : handleScanQR}
+          barcodeScannerSettings={{
+            barcodeTypes: ["qr"],
+            interval: 10,
+          }}
+          // ratio="16:9"
+          // whiteBalance={whiteBalance}
+        />
+        <Text style={styles.textQrCode}>put the QR code in the frame</Text>
+      </View>
+      <View style={styles.contentZoomSlider}>
+        <Slider
+          onValueChange={zoomEffect}
+          style={styles.zoomSlider}
+          minimumValue={0}
+          maximumValue={1}
+          minimumTrackTintColor="#FFFFFF"
+          maximumTrackTintColor="#808080"
+        />
+      </View>
+      <View style={styles.contentCameraOption}>
+        <View style={styles.cameraOption}>
+          {/* <View style={styles.contentCameraEffects}>
+                <ScrollView horizontal={true}>
+                  {cameraEffects?.map((cameraEffect) => (
+                    <TouchableWithoutFeedback
+                      onPress={() => handleWhiteBalance(cameraEffect?.id)}
+                      key={cameraEffect?.id}
+                    >
+                      <View style={styles.itemCameraEffect}>
+                        <Text style={styles.textItemCameraEffect}>
+                          {cameraEffect?.property}
+                        </Text>
+                      </View>
+                    </TouchableWithoutFeedback>
+                  ))}
+                </ScrollView>
+              </View> */}
+          <View style={styles.contentCameraIcon}>
+            <TouchableOpacity onPress={handleToggleFlipCamera}>
+              <MaterialCommunityIcons
+                name="camera-flip"
+                size={24}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleToggleFlash}>
+              <MaterialCommunityIcons
+                name={flash === "on" ? "flashlight" : "flashlight-off"}
+                size={24}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Home")}>
               <FontAwesome name="close" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
-      </Camera>
+      </View>
     </SafeAreaView>
   );
 }
@@ -205,13 +257,35 @@ const styles = StyleSheet.create({
   containerScanQr: {
     flex: 1,
   },
-  cameraView: {
+  contentCamera: {
     flex: 1,
+    backgroundColor: "#000000",
+  },
+  scanQr: {
+    width: 400,
+    height: 400,
+    position: "absolute",
+    top: 50,
+    alignSelf: "center",
+  },
+  cameraView: {
+    width: 260,
+    height: 260,
+    position: "absolute",
+    top: 120,
+    alignSelf: "center",
+  },
+  textQrCode: {
+    width: "100%",
+    marginTop: 450,
+    textAlign: "center",
+    fontSize: 14,
+    color: "#FFFFFF",
   },
   contentZoomSlider: {
     width: "100%",
-    position: "relative",
-    top: 460,
+    position: "absolute",
+    top: 500,
   },
   zoomSlider: {
     width: "100%",
