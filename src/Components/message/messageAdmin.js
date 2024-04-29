@@ -4,10 +4,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet, Text, View } from "react-native";
 
 import DisplayMessage from "./displayMessage";
-import Chat from "./chats";
-import RefreshPage from "./refreshPage";
+import Chat from "./chat";
+import RefreshPage from "../refreshPage";
 import { SOCKET_SERVER } from "@env";
-import { UserContext } from "../Context/UserContext";
+import { UserContext } from "../../Context/UserContext";
 
 function MessageAdmin({ showChat, setShowChat }) {
   const [state, dispatch] = useContext(UserContext);

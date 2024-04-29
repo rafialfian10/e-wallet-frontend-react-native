@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import HandleOpenDocument from "./handleOpenDocument";
+import HandleOpenDocument from "../handleOpenDocument";
 
 function ModalSendChatFile({
   form,

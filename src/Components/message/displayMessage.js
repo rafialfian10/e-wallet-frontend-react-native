@@ -78,7 +78,7 @@ function DisplayMessage({
                   />
                 ) : (
                   <Image
-                    source={require("../../assets/default-photo.png")}
+                    source={require("../../../assets/default-photo.png")}
                     style={styles.photo}
                     alt="default-photo"
                   />
@@ -128,7 +128,7 @@ function DisplayMessage({
                   />
                 ) : (
                   <Image
-                    source={require("../../assets/default-photo.png")}
+                    source={require("../../../assets/default-photo.png")}
                     style={styles.photo}
                     alt="default-photo"
                   />

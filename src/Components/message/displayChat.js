@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 
 import BtnDownloadFile from "./btnDownloadFile";
+import BtnPlayAudio from "./btnPlayAudio";
 
 function DisplayChat({
   state,
@@ -43,19 +44,27 @@ function DisplayChat({
       onLongPress={() => handleHold(item?.id)}
       onPress={() => handleClick(item?.id)}
     >
-      {item?.files?.map((file, j) => (
-        <View key={j} style={styles.contentDownloadFile}>
-          <BtnDownloadFile file={file} />
-          <Text style={styles.textFile}>
-            {file?.fileName?.length > 30
-              ? file?.fileName.slice(0, 30) + "..."
-              : file?.fileName}
-          </Text>
-        </View>
-      ))}
-      {item?.message !== "" && (
+      {item?.files?.map((file, index) =>
+        file?.fileType === "audio/webm" ? (
+          <View key={index} >
+            <BtnPlayAudio file={file} index={index} />
+          </View>
+        ) : (
+          <View key={index} style={styles.contentDownloadFile}>
+            <BtnDownloadFile file={file} />
+            <Text style={styles.textFile}>
+              {file?.fileName?.length > 30
+                ? file?.fileName.slice(0, 30) + "..."
+                : file?.fileName}
+            </Text>
+          </View>
+        )
+      )}
+      {/* {item?.message !== "" && ( */}
         <View style={styles.contentMessage}>
-          <Text style={styles.textMessage}>{item?.message}</Text>
+          {item?.message !== "" && (
+            <Text style={styles.textMessage}>{item?.message}</Text>
+          )}
           {(item?.recipientId === adminContact?.id ||
             item?.recipientId === userContact?.id) && (
             <View style={styles.contentDateIcon}>
@@ -76,7 +85,7 @@ function DisplayChat({
             </View>
           )}
         </View>
-      )}
+      {/* )} */}
     </TouchableOpacity>
   );
 
@@ -162,6 +171,7 @@ const styles = StyleSheet.create({
   textFile: {
     fontSize: 14,
     color: "#000000",
+    
   },
   contentMessage: {
     flexDirection: "column",
@@ -174,7 +184,6 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     fontSize: 14,
     color: "#000000",
-    borderColor: "black",
   },
   contentDateIcon: {
     display: "flex",

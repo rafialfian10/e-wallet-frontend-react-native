@@ -70,7 +70,7 @@ function DisplayProfileChat({
           />
         ) : (
           <Image
-            source={require("../../assets/default-photo.png")}
+            source={require("../../../assets/default-photo.png")}
             style={styles.photo}
             alt="photo"
           />

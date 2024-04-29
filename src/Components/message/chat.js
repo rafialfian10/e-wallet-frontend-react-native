@@ -5,7 +5,7 @@ import DisplayProfileChat from "./displayProfileChat";
 import BtnSendChat from "./btnSendChat";
 import DisplayChat from "./displayChat";
 import ModalSendChatFile from "./modalSendChatFile";
-import RefreshPage from "./refreshPage";
+import RefreshPage from "../refreshPage";
 
 function Chat({
   state,

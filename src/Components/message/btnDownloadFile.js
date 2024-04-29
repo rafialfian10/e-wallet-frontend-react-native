@@ -52,7 +52,7 @@ function BtnDownloadFile({ file }) {
       style={styles.btnDownloadFile}
       onPress={() => handleDownloadFile(file)}
     >
-      <MaterialCommunityIcons name="download" size={20} color="#000000" />
+      <MaterialCommunityIcons name="download" size={22} color="#000000" />
     </TouchableOpacity>
   );
 }

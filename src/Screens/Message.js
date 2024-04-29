@@ -2,8 +2,8 @@ import { useState, useContext } from "react";
 import { StyleSheet, SafeAreaView } from "react-native";
 
 import { UserContext } from "../Context/UserContext";
-import MessageUser from "../Components/messageUser";
-import MessageAdmin from "../Components/messageAdmin";
+import MessageUser from "../Components/message/messageUser";
+import MessageAdmin from "../Components/message/messageAdmin";
 
 function Message({ navigation }) {
   const [state, dispatch] = useContext(UserContext);
