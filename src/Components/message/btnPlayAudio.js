@@ -1,24 +1,32 @@
 import { useState, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
-import moment from "moment";
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+
+import FormattedTime from "./formattedTime";
 
 function BtnPlayAudio({ file, index }) {
   const [sound, setSound] = useState();
   const [playingAudio, setPlayingAudio] = useState(null);
   const [duration, setDuration] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [pausedPosition, setPausedPosition] = useState(0);
 
   async function playSound(file) {
     try {
       const { sound } = await Audio.Sound.createAsync({ uri: file?.filePath });
       setSound(sound);
 
-    //   console.log("Playing Sound");
-      await sound.playAsync();
+      // Continue from paused position if exists
+      if (pausedPosition) {
+        await sound.playFromPositionAsync(pausedPosition);
+        setPausedPosition(0);
+      } else {
+        await sound.playAsync();
+      }
+
       setPlayingAudio(index);
-      sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+      sound.setOnPlaybackStatusUpdate(handlePlayProgress);
     } catch (error) {
       console.log("Error playing sound: ", error);
     }
@@ -27,25 +35,34 @@ function BtnPlayAudio({ file, index }) {
   async function pauseSound() {
     try {
       if (sound && playingAudio !== null) {
-        await sound.pauseAsync();
-        setPlayingAudio(null);
+        const status = await sound.getStatusAsync();
+        if (status.isPlaying) {
+          await sound.pauseAsync();
+          setPausedPosition(status.positionMillis); // Store current position
+          setPlayingAudio(null);
+        }
       }
     } catch (error) {
       console.log("Error pausing sound: ", error);
     }
   }
 
-  const onPlaybackStatusUpdate = (status) => {
-    if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
+  const handlePlayProgress = (status) => {
+    if (!status.isPlaying && status.didJustFinish) {
       // Stop sound and reset state
       pauseSound();
-      setProgress(0);
-      setDuration(0);
       setPlayingAudio(null);
+      setDuration(0);
+      setProgress(0);
     } else {
       // Update progress and duration
       setDuration(status.positionMillis);
       setProgress(status.positionMillis / status.durationMillis);
+
+      // auto reset sound if finished
+      if (status.didJustFinish) {
+        pauseSound();
+      }
     }
   };
 
@@ -57,24 +74,6 @@ function BtnPlayAudio({ file, index }) {
         }
       : undefined;
   }, [sound]);
-
-  const formattedTime = (time) => {
-    const durationMoment = moment.duration(time);
-    let formatted = "";
-
-    if (durationMoment.hours() > 0) {
-      formatted += durationMoment.hours() + ":";
-    }
-
-    formatted +=
-      (durationMoment.minutes() < 10 ? "0" : "") +
-      durationMoment.minutes() +
-      ":";
-    formatted +=
-      (durationMoment.seconds() < 10 ? "0" : "") + durationMoment.seconds();
-
-    return formatted;
-  };
 
   return (
     <View>
@@ -98,7 +97,19 @@ function BtnPlayAudio({ file, index }) {
           <View style={[styles.progress, { width: `${progress * 100}%` }]} />
         </View>
       </View>
-      <Text style={styles.textTimerAudio}>{formattedTime(duration)}</Text>
+      <Text style={styles.textTimerAudio}>
+        <Text style={styles.textTimerAudio}>
+          {playingAudio === index
+            ? FormattedTime(
+                playingAudio === index
+                  ? pausedPosition !== 0
+                    ? pausedPosition
+                    : duration
+                  : 0
+              )
+            : FormattedTime(pausedPosition || file.duration)}
+        </Text>
+      </Text>
     </View>
   );
 }

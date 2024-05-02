@@ -1,13 +1,39 @@
 import { useState } from "react";
-import { Ionicons, MaterialIcons, EvilIcons } from "@expo/vector-icons";
-import { StyleSheet, View, Text, TextInput, Pressable } from "react-native";
+import {
+  Ionicons,
+  FontAwesome,
+  MaterialIcons,
+  EvilIcons,
+} from "@expo/vector-icons";
+import { StyleSheet, View, Text, TextInput, Pressable, Animated } from "react-native";
 
 import HandleOpenDocument from "../handleOpenDocument";
 import HandleOpenCamera from "../handleOpenCamera";
 import BtnRecordAudio from "./btnRecordAudio";
 
-function BtnSendChat({ form, setForm, userContact, adminContact, onSendMessage }) {
+import FormattedTime from "./formattedTime";
+import ShowHideAnimation from "./showHideAnimation";
+
+function BtnSendChat({
+  form,
+  setForm,
+  userContact,
+  adminContact,
+  onSendMessage,
+}) {
+  const [recording, setRecording] = useState();
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedTime, setRecordedTime] = useState(0);
   const [infoRecording, setInfoRecording] = useState(false);
+
+  // animation
+  const { fadeAnim } = ShowHideAnimation();
+
+  const handleRecordingProgress = (status) => {
+    if (status && status.durationMillis) {
+      setRecordedTime(status.durationMillis);
+    }
+  };
 
   const handleChange = (data, value) => {
     setForm({
@@ -29,14 +55,24 @@ function BtnSendChat({ form, setForm, userContact, adminContact, onSendMessage }
   return (
     <View style={styles.contentBtnChat}>
       <TextInput
-        placeholder="Type a message"
+        placeholder={
+          !recording ? "Type a message" : FormattedTime(recordedTime)
+        }
+        placeholderTextColor={!recording ? "#000000" : "#F55676"}
         multiline={true}
         style={styles.inputChat}
         onChangeText={(value) => handleChange("message", value)}
         value={form.message}
       />
+      {recording && (
+        <Animated.View
+          style={[styles.contentMicrophone, { opacity: fadeAnim }]}
+        >
+          <FontAwesome name="microphone" size={22} color="#F55676" />
+        </Animated.View>
+      )}
       <View style={styles.contentIcon}>
-        <Pressable style={styles.iconAttachFile}>
+        <Pressable>
           <MaterialIcons
             name="attach-file"
             size={22}
@@ -74,7 +110,12 @@ function BtnSendChat({ form, setForm, userContact, adminContact, onSendMessage }
             form={form}
             userContact={userContact}
             adminContact={adminContact}
+            recording={recording}
+            setRecording={setRecording}
+            isRecording={isRecording}
+            setIsRecording={setIsRecording}
             setInfoRecording={setInfoRecording}
+            onRecordingProgress={handleRecordingProgress}
           />
         </>
       )}
@@ -99,7 +140,7 @@ const styles = StyleSheet.create({
   },
   inputChat: {
     width: "85%",
-    paddingLeft: 10,
+    paddingLeft: 30,
     paddingRight: 40,
     paddingVertical: 10,
     textAlign: "left",
@@ -107,6 +148,14 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     fontSize: 14,
     backgroundColor: "#FFFFFF",
+  },
+  contentMicrophone: {
+    position: "absolute",
+    left: 10,
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    flexDirection: "row",
   },
   contentIcon: {
     position: "absolute",
@@ -116,7 +165,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  iconAttachFile: {},
   iconCamera: {
     marginLeft: 10,
   },

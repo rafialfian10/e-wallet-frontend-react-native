@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { Audio } from "expo-av";
 import { FontAwesome } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system";
@@ -8,11 +8,14 @@ function BtnRecordAudio({
   form,
   userContact,
   adminContact,
+  recording,
+  setRecording,
+  isRecording,
+  setIsRecording,
   setInfoRecording,
+  onRecordingProgress,
 }) {
   const holdTimeout = useRef(null);
-  const [recording, setRecording] = useState();
-  const [isRecording, setIsRecording] = useState(false);
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
   async function startRecording() {
@@ -30,6 +33,8 @@ function BtnRecordAudio({
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
+
+      recording.setOnRecordingStatusUpdate(onRecordingProgress)
 
       setIsRecording(true);
       setRecording(recording);
@@ -53,10 +58,11 @@ function BtnRecordAudio({
 
     const dataFiles = [{
       uri: recording.getURI(),
-      fileName: `recording-${Date.now()}.caf`,
+      fileName: `recording-${Date.now()}.${recording._options.android.extension}`,
       fileType: recording._options.web.mimeType,
-      fileSize: 100,
+      // fileSize: 100,
       base64: base64,
+      duration: recording._finalDurationMillis,
     }];
 
     const data = {

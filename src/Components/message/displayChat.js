@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 
@@ -46,7 +46,7 @@ function DisplayChat({
     >
       {item?.files?.map((file, index) =>
         file?.fileType === "audio/webm" ? (
-          <View key={index} >
+          <View key={index}>
             <BtnPlayAudio file={file} index={index} />
           </View>
         ) : (
@@ -60,32 +60,30 @@ function DisplayChat({
           </View>
         )
       )}
-      {/* {item?.message !== "" && ( */}
-        <View style={styles.contentMessage}>
-          {item?.message !== "" && (
-            <Text style={styles.textMessage}>{item?.message}</Text>
-          )}
-          {(item?.recipientId === adminContact?.id ||
-            item?.recipientId === userContact?.id) && (
-            <View style={styles.contentDateIcon}>
-              <Text style={styles.textDate}>
-                {moment(item?.createdAt).format("HH:mm")}
-              </Text>
-              <Ionicons
-                id="icon"
-                name={
-                  item?.notification !== null
-                    ? "checkmark-outline"
-                    : "checkmark-done-outline"
-                }
-                size={15}
-                color={item.notification !== null ? "#000000" : "#3773DB"}
-                style={styles.checklistIcon}
-              />
-            </View>
-          )}
-        </View>
-      {/* )} */}
+      <View style={styles.contentMessage}>
+        {item?.message !== "" && (
+          <Text style={styles.textMessage}>{item?.message}</Text>
+        )}
+        {(item?.recipientId === adminContact?.id ||
+          item?.recipientId === userContact?.id) && (
+          <View style={styles.contentDateIcon}>
+            <Text style={styles.textDate}>
+              {moment(item?.createdAt).format("HH:mm")}
+            </Text>
+            <Ionicons
+              id="icon"
+              name={
+                item?.notification !== null
+                  ? "checkmark-outline"
+                  : "checkmark-done-outline"
+              }
+              size={15}
+              color={item.notification !== null ? "#000000" : "#3773DB"}
+              style={styles.checklistIcon}
+            />
+          </View>
+        )}
+      </View>
     </TouchableOpacity>
   );
 
@@ -171,7 +169,6 @@ const styles = StyleSheet.create({
   textFile: {
     fontSize: 14,
     color: "#000000",
-    
   },
   contentMessage: {
     flexDirection: "column",
