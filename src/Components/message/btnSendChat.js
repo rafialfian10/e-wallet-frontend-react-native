@@ -2,17 +2,25 @@ import { useState } from "react";
 import {
   Ionicons,
   FontAwesome,
+  AntDesign,
   MaterialIcons,
   EvilIcons,
 } from "@expo/vector-icons";
-import { StyleSheet, View, Text, TextInput, Pressable, Animated } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  Animated,
+} from "react-native";
 
-import HandleOpenDocument from "../handleOpenDocument";
-import HandleOpenCamera from "../handleOpenCamera";
+import HandleOpenDocument from "./handleOpenDocument";
+import ModalCamera from "./modalCamera";
 import BtnRecordAudio from "./btnRecordAudio";
-
 import FormattedTime from "./formattedTime";
 import ShowHideAnimation from "./showHideAnimation";
+import HandleOpenCamera from "./handleOpenCamera";
 
 function BtnSendChat({
   form,
@@ -25,9 +33,10 @@ function BtnSendChat({
   const [isRecording, setIsRecording] = useState(false);
   const [recordedTime, setRecordedTime] = useState(0);
   const [infoRecording, setInfoRecording] = useState(false);
+  const [modalCameraVisible, setModalCameraVisible] = useState(false);
 
   // animation
-  const { fadeAnim } = ShowHideAnimation();
+  const { showHideAnim } = ShowHideAnimation();
 
   const handleRecordingProgress = (status) => {
     if (status && status.durationMillis) {
@@ -55,44 +64,48 @@ function BtnSendChat({
   return (
     <View style={styles.contentBtnChat}>
       <TextInput
-        placeholder={
-          !recording ? "Type a message" : FormattedTime(recordedTime)
-        }
-        placeholderTextColor={!recording ? "#000000" : "#F55676"}
-        multiline={true}
         style={styles.inputChat}
+        placeholder={
+          isRecording ? FormattedTime(recordedTime) : "Type a message"
+        }
+        placeholderTextColor={isRecording ? "#F55676" : "#808080"}
+        multiline={true}
         onChangeText={(value) => handleChange("message", value)}
         value={form.message}
       />
-      {recording && (
-        <Animated.View
-          style={[styles.contentMicrophone, { opacity: fadeAnim }]}
-        >
-          <FontAwesome name="microphone" size={22} color="#F55676" />
-        </Animated.View>
-      )}
-      <View style={styles.contentIcon}>
-        <Pressable>
-          <MaterialIcons
-            name="attach-file"
-            size={22}
+      {isRecording ? (
+        <View style={styles.contentMicrophone}>
+          <Animated.View
+            style={[styles.microphoneAnim, { opacity: showHideAnim }]}
+          >
+            <FontAwesome name="microphone" size={22} color="#F55676" />
+          </Animated.View>
+          <AntDesign
+            name="left"
+            size={11}
             color="#808080"
-            onPress={() => HandleOpenDocument({ form, setForm })}
+            style={{ marginRight: 5 }}
           />
-        </Pressable>
-        {form.message !== "" ? (
-          <View></View>
-        ) : (
-          <Pressable style={styles.iconCamera}>
-            <EvilIcons
-              name="camera"
-              size={28}
-              color="#808080"
-              onPress={() => HandleOpenCamera({ form, setForm })}
-            />
+          <Text style={styles.textRecordCancel}>Swipe to cancel</Text>
+        </View>
+      ) : (
+        <View style={styles.contentIcon}>
+          <Pressable onPress={() => HandleOpenDocument({ form, setForm })}>
+            <MaterialIcons name="attach-file" size={22} color="#808080" />
           </Pressable>
-        )}
-      </View>
+          {form.message !== "" ? (
+            <View></View>
+          ) : (
+            <Pressable
+              style={styles.iconCamera}
+              onPress={() => setModalCameraVisible(true)}
+              // onPress={() => HandleOpenCamera({ form, setForm })}
+            >
+              <EvilIcons name="camera" size={28} color="#808080" />
+            </Pressable>
+          )}
+        </View>
+      )}
       {form.message !== "" ? (
         <Pressable onPress={handleSendMessage} style={styles.btnSend}>
           <Ionicons name="send" size={22} color="#FFFFFF" />
@@ -119,6 +132,16 @@ function BtnSendChat({
           />
         </>
       )}
+
+      {modalCameraVisible && (
+        <ModalCamera
+          form={form}
+          setForm={setForm}
+          onSendMessage={onSendMessage}
+          modalCameraVisible={modalCameraVisible}
+          closeModalCamera={() => setModalCameraVisible(false)}
+        />
+      )}
     </View>
   );
 }
@@ -126,9 +149,9 @@ function BtnSendChat({
 const styles = StyleSheet.create({
   contentBtnChat: {
     width: "95%",
-    position: "absolute",
+    position: "relative",
     bottom: 0,
-    paddingBottom: 5,
+    marginBottom: 5,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -140,7 +163,7 @@ const styles = StyleSheet.create({
   },
   inputChat: {
     width: "85%",
-    paddingLeft: 30,
+    paddingLeft: 35,
     paddingRight: 40,
     paddingVertical: 10,
     textAlign: "left",
@@ -150,12 +173,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   contentMicrophone: {
+    width: "100%",
     position: "absolute",
-    left: 10,
+    padding: 10,
     display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  microphoneAnim: {
+    marginRight: 110,
+    display: "flex",
+    flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    flexDirection: "row",
+  },
+  textRecordCancel: {
+    fontSize: 12,
+    color: "#808080",
   },
   contentIcon: {
     position: "absolute",

@@ -20,29 +20,13 @@ import FormPin from "../Components/formPin";
 import ModalTransferSuccess from "../Components/modalTransactionSuccess";
 import { GetUser } from "../Components/Common/Hooks/getUser";
 
-// const cameraEffects = [
-//   { id: "auto", property: "Auto" },
-//   { id: "sunny", property: "Sunny" },
-//   { id: "cloudy", property: "Cloudy" },
-//   { id: "shadow", property: "Shadow" },
-//   { id: "incandescent", property: "Incandescent" },
-//   { id: "fluorescent", property: "Fluorescent" },
-// ];
-
 const initialState = {
   zoomValue: 0,
-  whiteBalance: "auto",
-  cameraType: "back",
   flash: "off",
 };
 
 function reducer(state = initialState, action) {
   switch (action.type) {
-    case "@type/WH_BALANCE":
-      return { ...state, whiteBalance: action.payload };
-    case "@type/CAMERA_BACK":
-    case "@type/CAMERA_FRONT":
-      return { ...state, cameraType: action.payload };
     case "@type/FLASH":
       return { ...state, flash: action.payload };
     case "@type/ZOOM":
@@ -79,7 +63,7 @@ export default function ScanQR({ navigation }) {
   }, []);
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { zoomValue, whiteBalance, cameraType, flash } = state;
+  const { zoomValue, flash } = state;
   const camera = useRef(null);
 
   if (!permission) {
@@ -93,6 +77,10 @@ export default function ScanQR({ navigation }) {
       </Text>
     );
   }
+
+  const zoomEffect = (value) => {
+    dispatch({ type: "@type/ZOOM", payload: value });
+  };
 
   const handleScanQR = (data) => {
     setScanned(true);
@@ -127,14 +115,6 @@ export default function ScanQR({ navigation }) {
     }
   };
 
-  const handleToggleFlipCamera = () => {
-    if (cameraType === "back") {
-      dispatch({ type: "@type/CAMERA_FRONT", payload: "front" });
-    } else {
-      dispatch({ type: "@type/CAMERA_BACK", payload: "back" });
-    }
-  };
-
   const handleToggleFlash = () => {
     if (flash === "off") {
       dispatch({ type: "@type/FLASH", payload: "on" });
@@ -142,16 +122,6 @@ export default function ScanQR({ navigation }) {
       dispatch({ type: "@type/FLASH", payload: "off" });
     }
   };
-
-  const zoomEffect = (value) => {
-    dispatch({ type: "@type/ZOOM", payload: value });
-  };
-
-  // const handleWhiteBalance = (value) => {
-  //   if (value.length > 0) {
-  //     dispatch({ type: "@type/WH_BALANCE", payload: value });
-  //   }
-  // };
 
   return form !== null ? (
     <SafeAreaView style={styles.containerScanQr}>
@@ -188,15 +158,12 @@ export default function ScanQR({ navigation }) {
           ref={camera}
           autoFocus={true}
           zoom={zoomValue}
-          facing={cameraType}
-          flash={FlashMode.on}
+          flash={flash}
           onBarcodeScanned={scanned ? undefined : handleScanQR}
           barcodeScannerSettings={{
             barcodeTypes: ["qr"],
             interval: 10,
           }}
-          // ratio="16:9"
-          // whiteBalance={whiteBalance}
         />
         <Text style={styles.textQrCode}>put the QR code in the frame</Text>
       </View>
@@ -212,30 +179,7 @@ export default function ScanQR({ navigation }) {
       </View>
       <View style={styles.contentCameraOption}>
         <View style={styles.cameraOption}>
-          {/* <View style={styles.contentCameraEffects}>
-                <ScrollView horizontal={true}>
-                  {cameraEffects?.map((cameraEffect) => (
-                    <TouchableWithoutFeedback
-                      onPress={() => handleWhiteBalance(cameraEffect?.id)}
-                      key={cameraEffect?.id}
-                    >
-                      <View style={styles.itemCameraEffect}>
-                        <Text style={styles.textItemCameraEffect}>
-                          {cameraEffect?.property}
-                        </Text>
-                      </View>
-                    </TouchableWithoutFeedback>
-                  ))}
-                </ScrollView>
-              </View> */}
           <View style={styles.contentCameraIcon}>
-            <TouchableOpacity onPress={handleToggleFlipCamera}>
-              <MaterialCommunityIcons
-                name="camera-flip"
-                size={24}
-                color="#FFFFFF"
-              />
-            </TouchableOpacity>
             <TouchableOpacity onPress={handleToggleFlash}>
               <MaterialCommunityIcons
                 name={flash === "on" ? "flashlight" : "flashlight-off"}
@@ -305,23 +249,11 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
   },
-  contentCameraEffects: {
-    width: "100%",
-    alignItems: "center",
-    backgroundColor: "#808080",
-  },
-  itemCameraEffect: {
-    padding: 10,
-  },
-  textItemCameraEffect: {
-    fontSize: 14,
-    color: "#FFFFFF",
-  },
   contentCameraIcon: {
     padding: 20,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
   },
   textCameraPermission: {
     flex: 1,

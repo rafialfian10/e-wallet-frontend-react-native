@@ -13,9 +13,10 @@ import {
   TextInput,
   Pressable,
   TouchableOpacity,
+  Image,
 } from "react-native";
 
-import HandleOpenDocument from "../handleOpenDocument";
+import HandleOpenDocument from "./handleOpenDocument";
 
 function ModalSendChatFile({
   form,
@@ -49,7 +50,18 @@ function ModalSendChatFile({
   return (
     <View style={styles.centeredView}>
       <Modal animationType="slide" transparent={true} visible={modalChatFile}>
-        <View style={styles.modalViewChatFile}>
+        <View
+          style={[
+            styles.modalViewChatFile,
+            {
+              backgroundColor: form?.files?.some(
+                (file) => file?.type !== undefined
+              )
+                ? "#000000"
+                : "#FFFFFF",
+            },
+          ]}
+        >
           <TouchableOpacity
             style={styles.btnCloseModalSendFile}
             onPress={closeModalChatFile}
@@ -58,23 +70,32 @@ function ModalSendChatFile({
           </TouchableOpacity>
 
           <ScrollView style={styles.contentFiles}>
-            {form?.files?.map((file, i) => (
-              <View key={i} style={styles.files}>
-                <AntDesign name="file1" size={30} color="black" />
-                <Text style={styles.filename}>
-                  {file?.fileName.length > 30
-                    ? file?.fileName.substring(0, 30) + "..."
-                    : file?.fileName}
-                </Text>
-                <MaterialIcons
-                  name="cancel"
-                  size={20}
-                  color="#F75964"
-                  onPress={() => deleteFile(i)}
-                  style={styles.deleteIcon}
+            {form?.files?.map((file, i) => {
+              return file?.type && file?.type !== undefined ? (
+                <Image
+                  key={i}
+                  source={{ uri: file?.uri }}
+                  alt={file?.fileName}
+                  style={{ aspectRatio: file?.width / file?.height }}
                 />
-              </View>
-            ))}
+              ) : (
+                <View key={i} style={styles.files}>
+                  <AntDesign name="file1" size={30} color="black" />
+                  <Text style={styles.filename}>
+                    {file?.fileName.length > 30
+                      ? file?.fileName.substring(0, 30) + "..."
+                      : file?.fileName}
+                  </Text>
+                  <MaterialIcons
+                    name="cancel"
+                    size={20}
+                    color="#F75964"
+                    onPress={() => deleteFile(i)}
+                    style={styles.deleteIcon}
+                  />
+                </View>
+              );
+            })}
           </ScrollView>
 
           <View style={styles.contentBtnChat}>
@@ -86,13 +107,20 @@ function ModalSendChatFile({
               value={form.message}
             />
             <View style={styles.contentIcon}>
-              <TouchableOpacity style={styles.iconAttachFile} onPress={() => HandleOpenDocument({ form, setForm })}>
-                <MaterialCommunityIcons
-                  name="image-plus"
-                  size={24}
-                  color="#808080"
-                />
-              </TouchableOpacity>
+              {form?.files?.some((file) => file?.type !== undefined) ? (
+                ""
+              ) : (
+                <TouchableOpacity
+                  style={styles.iconAttachFile}
+                  onPress={() => HandleOpenDocument({ form, setForm })}
+                >
+                  <MaterialCommunityIcons
+                    name="image-plus"
+                    size={24}
+                    color="#808080"
+                  />
+                </TouchableOpacity>
+              )}
             </View>
             <Pressable style={styles.btnSend} onPress={handleSendFileMessage}>
               <Ionicons name="send" size={22} color="#FFFFFF" />
@@ -110,24 +138,28 @@ const styles = StyleSheet.create({
   },
   modalViewChatFile: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
   },
   btnCloseModalSendFile: {
-    width: 30,
-    height: 30,
+    position: "absolute",
+    width: 31,
+    height: 31,
     margin: 10,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 50,
     backgroundColor: "#C9C4C3",
+    zIndex: 10,
   },
   contentFiles: {
-    marginTop: 20,
-    marginBottom: 80,
-    marginHorizontal: 10,
-    paddingVertical: 10,
+    flex: 1,
+    paddingTop: 60,
+    paddingBottom: 30,
     display: "flex",
     flexDirection: "column",
   },
   files: {
+    marginHorizontal: 10,
     marginBottom: 10,
     display: "flex",
     flexDirection: "row",
@@ -143,7 +175,7 @@ const styles = StyleSheet.create({
   contentBtnChat: {
     width: "95%",
     position: "absolute",
-    bottom: 0,
+    bottom: 10,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -161,7 +193,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "center",
     borderRadius: 25,
     fontSize: 14,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "#FFFFFF",
   },
   contentIcon: {
     position: "absolute",

@@ -27,6 +27,10 @@ function Chat({
 
   const closeModalChatFile = () => {
     setModalChatFile(false);
+    setForm({
+      message: "",
+      files: [],
+    });
   };
 
   useEffect(() => {
@@ -44,6 +48,7 @@ function Chat({
       fileType: file?.fileType || file?.mimeType,
       fileSize: file?.fileSize || file?.filesize,
       base64: file?.base64,
+      type: file?.type,
     }));
 
     const data = {

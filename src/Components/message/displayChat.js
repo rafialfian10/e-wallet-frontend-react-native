@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 
@@ -44,22 +44,34 @@ function DisplayChat({
       onLongPress={() => handleHold(item?.id)}
       onPress={() => handleClick(item?.id)}
     >
-      {item?.files?.map((file, index) =>
-        file?.fileType === "audio/webm" ? (
-          <View key={index}>
-            <BtnPlayAudio file={file} index={index} />
-          </View>
-        ) : (
-          <View key={index} style={styles.contentDownloadFile}>
-            <BtnDownloadFile file={file} />
-            <Text style={styles.textFile}>
-              {file?.fileName?.length > 30
-                ? file?.fileName.slice(0, 30) + "..."
-                : file?.fileName}
-            </Text>
-          </View>
-        )
-      )}
+      {item?.files?.map((file, index) => {
+        if (file?.fileType === "audio/webm") {
+          return (
+            <View key={index}>
+              <BtnPlayAudio file={file} index={index} />
+            </View>
+          );
+        } else {
+          return (
+            <View key={index} style={styles.contentShowFile}>
+              {file?.type !== null ? (
+                <Image source={{ uri: file?.filePath }} alt={file?.fileName} style={styles.filePhoto} />
+              ) : (
+                <View style={styles.contentDownloadFile}>
+                  <BtnDownloadFile file={file} />
+                  <Text style={styles.textFile}>
+                    {file?.fileName?.length > 30
+                      ? file?.fileName.slice(0, 30) + "..."
+                      : file?.fileName}
+                  </Text>
+                </View>
+              )}
+            </View>
+          );
+          
+        }
+      })}
+
       <View style={styles.contentMessage}>
         {item?.message !== "" && (
           <Text style={styles.textMessage}>{item?.message}</Text>
@@ -160,6 +172,16 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
   },
+  contentShowFile: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  filePhoto :{ 
+    width: 250, 
+    height: 250,
+    borderRadius: 5,
+  },
   contentDownloadFile: {
     marginBottom: 10,
     display: "flex",
@@ -176,18 +198,19 @@ const styles = StyleSheet.create({
   },
   textMessage: {
     width: "100%",
-    marginBottom: 5,
     textAlign: "left",
     textAlignVertical: "center",
     fontSize: 14,
     color: "#000000",
   },
   contentDateIcon: {
+    marginTop: 5,
     display: "flex",
     flexDirection: "row",
     alignSelf: "flex-end",
   },
   textDate: {
+    marginRight: 3,
     textAlign: "center",
     textAlignVertical: "center",
     fontSize: 10,
