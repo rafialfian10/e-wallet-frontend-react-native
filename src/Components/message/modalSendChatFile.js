@@ -1,3 +1,5 @@
+import { useRef } from "react";
+import { Video, ResizeMode } from "expo-av";
 import {
   MaterialIcons,
   MaterialCommunityIcons,
@@ -14,6 +16,7 @@ import {
   Pressable,
   TouchableOpacity,
   Image,
+  Dimensions,
 } from "react-native";
 
 import HandleOpenDocument from "./handleOpenDocument";
@@ -21,10 +24,15 @@ import HandleOpenDocument from "./handleOpenDocument";
 function ModalSendChatFile({
   form,
   setForm,
-  onSendMessage,
   modalChatFile,
   closeModalChatFile,
+  onSendMessage,
 }) {
+  const video = useRef(null);
+
+  const { height } = Dimensions.get("window");
+  const videoHeight = height * 0.8;
+
   const handleChange = (data, value) => {
     setForm({
       ...form,
@@ -68,16 +76,27 @@ function ModalSendChatFile({
           >
             <AntDesign name="closecircleo" size={30} color="#000000" />
           </TouchableOpacity>
-
           <ScrollView style={styles.contentFiles}>
             {form?.files?.map((file, i) => {
               return file?.type && file?.type !== undefined ? (
-                <Image
-                  key={i}
-                  source={{ uri: file?.uri }}
-                  alt={file?.fileName}
-                  style={{ aspectRatio: file?.width / file?.height }}
-                />
+                file?.type === "image" ? (
+                  <Image
+                    key={i}
+                    source={{ uri: file?.uri }}
+                    alt={file?.fileName}
+                    style={{ aspectRatio: file?.width / file?.height }}
+                  />
+                ) : (
+                  <Video
+                    key={i}
+                    style={{ width: "100%", height: videoHeight }}
+                    ref={video}
+                    source={{ uri: file?.uri }}
+                    isLooping={true}
+                    useNativeControls={true}
+                    resizeMode={ResizeMode.COVER}
+                  />
+                )
               ) : (
                 <View key={i} style={styles.files}>
                   <AntDesign name="file1" size={30} color="black" />

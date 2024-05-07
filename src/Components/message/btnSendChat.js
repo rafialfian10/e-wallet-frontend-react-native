@@ -16,8 +16,8 @@ import {
 } from "react-native";
 
 import HandleOpenDocument from "./handleOpenDocument";
-import ModalCamera from "./modalCamera";
 import BtnRecordAudio from "./btnRecordAudio";
+import ModalCamera from "./modalCamera";
 import FormattedTime from "./formattedTime";
 import ShowHideAnimation from "./showHideAnimation";
 import HandleOpenCamera from "./handleOpenCamera";
@@ -137,7 +137,6 @@ function BtnSendChat({
         <ModalCamera
           form={form}
           setForm={setForm}
-          onSendMessage={onSendMessage}
           modalCameraVisible={modalCameraVisible}
           closeModalCamera={() => setModalCameraVisible(false)}
         />

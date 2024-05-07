@@ -96,9 +96,9 @@ function Chat({
         <ModalSendChatFile
           form={form}
           setForm={setForm}
-          onSendMessage={onSendMessage}
           modalChatFile={modalChatFile}
           closeModalChatFile={closeModalChatFile}
+          onSendMessage={onSendMessage}
         />
       )}
     </>

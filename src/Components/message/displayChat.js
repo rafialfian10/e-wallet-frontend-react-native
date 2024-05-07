@@ -1,10 +1,17 @@
 import { useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Image,
+} from "react-native";
 
 import BtnDownloadFile from "./btnDownloadFile";
 import BtnPlayAudio from "./btnPlayAudio";
+import BtnPlayVideo from "./btnPlayVideo";
 
 function DisplayChat({
   state,
@@ -27,7 +34,7 @@ function DisplayChat({
   };
 
   const renderMessage = (item, i) => (
-    <TouchableOpacity
+    <Pressable
       key={i}
       style={[
         styles.subContentChat,
@@ -55,7 +62,15 @@ function DisplayChat({
           return (
             <View key={index} style={styles.contentShowFile}>
               {file?.type !== null ? (
-                <Image source={{ uri: file?.filePath }} alt={file?.fileName} style={styles.filePhoto} />
+                file?.type === "image" ? (
+                  <Image
+                    style={styles.filePhoto}
+                    source={{ uri: file?.filePath }}
+                    alt={file?.fileName}
+                  />
+                ) : (
+                  <BtnPlayVideo file={file} />
+                )
               ) : (
                 <View style={styles.contentDownloadFile}>
                   <BtnDownloadFile file={file} />
@@ -68,7 +83,6 @@ function DisplayChat({
               )}
             </View>
           );
-          
         }
       })}
 
@@ -96,7 +110,7 @@ function DisplayChat({
           </View>
         )}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 
   useEffect(() => {
@@ -177,8 +191,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  filePhoto :{ 
-    width: 250, 
+  filePhoto: {
+    width: 250,
     height: 250,
     borderRadius: 5,
   },

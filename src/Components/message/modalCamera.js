@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useReducer } from "react";
+import { useState, useRef, useReducer } from "react";
 import Slider from "@react-native-community/slider";
-import { Camera } from "expo-camera";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
 import {
+  Ionicons,
   FontAwesome,
   MaterialCommunityIcons,
-  Entypo,
 } from "@expo/vector-icons";
 import {
   StyleSheet,
@@ -16,6 +17,9 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
+import TakeCameraView from "./takeCameraView";
+import RecordVideoView from "./recordVideoView";
+
 const initialState = {
   zoomValue: 0,
   whiteBalance: "auto",
@@ -25,7 +29,7 @@ const initialState = {
 
 function reducer(state = initialState, action) {
   switch (action.type) {
-    case "@type/WH_BALANCE":
+    case "@type/WHITE_BALANCE":
       return { ...state, whiteBalance: action.payload };
     case "@type/CAMERA_BACK":
     case "@type/CAMERA_FRONT":
@@ -42,19 +46,14 @@ function reducer(state = initialState, action) {
   }
 }
 
-function ModalCamera({
-  form,
-  setForm,
-  onSendMessage,
-  modalCameraVisible,
-  closeModalCamera,
-}) {
-  const [permission, setPermission] = Camera.useCameraPermissions();
-
+function ModalCamera({ form, setForm, modalCameraVisible, closeModalCamera }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { zoomValue, whiteBalance, cameraType, flash } = state;
-  const [activeEffect, setActiveEffect] = useState(null);
+
   const camera = useRef(null);
+  const [mode, setMode] = useState("camera");
+  const [isRecordingVideo, setIsRecordingVideo] = useState(false);
+  const [activeEffect, setActiveEffect] = useState(null);
 
   const cameraEffects = [
     { id: "auto", property: "Auto" },
@@ -64,23 +63,6 @@ function ModalCamera({
     { id: "incandescent", property: "Incandescent" },
     { id: "fluorescent", property: "Fluorescent" },
   ];
-
-  useEffect(() => {
-    const getCameraPermissions = async () => {
-      const cameraPermission = await Camera.requestCameraPermissionsAsync();
-      setPermission(cameraPermission);
-    };
-
-    getCameraPermissions();
-  }, []);
-
-  if (!permission) {
-    return <View />;
-  }
-
-  if (!permission.granted) {
-    return;
-  }
 
   const handleToggleFlipCamera = () => {
     if (cameraType === "back") {
@@ -105,7 +87,7 @@ function ModalCamera({
   const handleWhiteBalance = (value) => {
     setActiveEffect(value);
     if (value.length > 0) {
-      dispatch({ type: "@type/WH_BALANCE", payload: value });
+      dispatch({ type: "@type/WHITE_BALANCE", payload: value });
     }
   };
 
@@ -123,29 +105,104 @@ function ModalCamera({
       const uriParts = photo.uri.split("/");
       const fileName = uriParts[uriParts.length - 1];
 
-      const form = {
-        message: "",
-        files: [
-          {
-            uri: photo.uri,
-            fileName: fileName,
-            fileType: "image/jpeg",
-            base64: photo.base64,
-            type: "image",
-          },
-        ],
+      const dataFiles = {
+        uri: photo.uri,
+        fileName: fileName,
+        fileType: "image/jpeg",
+        base64: photo.base64,
+        type: "image",
+        width: photo.width,
+        height: photo.height,
       };
 
       if (photo) {
-        onSendMessage(form);
         setForm({
-          message: "",
-          files: [],
+          ...form,
+          files: [...form.files, dataFiles],
         });
         closeModalCamera();
+        camera.current = null;
       }
     }
   };
+
+  const handleRecordVideo = async () => {
+    setIsRecordingVideo(true);
+
+    if (camera.current) {
+      let result = {
+        quality: "1080p",
+        maxDuration: 300,
+        mute: false,
+        // maxFileSize: 100000000, // 100MB in bytes
+      };
+
+      const video = await camera.current.recordAsync(result);
+
+      // catch file name
+      const uriParts = video.uri.split("/");
+      const fileName = uriParts[uriParts.length - 1];
+
+      const base64 = await FileSystem.readAsStringAsync(video?.uri, {
+        encoding: FileSystem?.EncodingType?.Base64,
+      });
+
+      const dataFiles = {
+        uri: video.uri,
+        fileName: fileName,
+        fileType: "video/mp4",
+        base64: base64,
+        type: "video",
+      };
+
+      if (video) {
+        setForm({
+          ...form,
+          files: [...form.files, dataFiles],
+        });
+
+        setIsRecordingVideo(false);
+        closeModalCamera();
+        camera.current = null;
+      }
+    }
+  };
+
+  let handleStopRecording = () => {
+    setIsRecordingVideo(false);
+    camera.current.stopRecording();
+  };
+
+  // if (video) {
+  //   let shareVideo = () => {
+  //     Sharing.shareAsync(video.uri).then(() => {
+  //       setVideo(undefined);
+  //     });
+  //   };
+
+  //   let saveVideo = () => {
+  //     MediaLibrary.saveToLibraryAsync(video.uri).then(() => {
+  //       setVideo(undefined);
+  //     });
+  //   };
+
+  //   return (
+  //     <SafeAreaView style={styles.container}>
+  //       <Video
+  //         style={styles.video}
+  //         source={{ uri: video.uri }}
+  //         useNativeControls
+  //         resizeMode="contain"
+  //         isLooping={true}
+  //       />
+  //       <Button title="Share" onPress={shareVideo} />
+  //       {mediaLibraryPermission ? (
+  //         <Button title="Save" onPress={saveVideo} />
+  //       ) : undefined}
+  //       <Button title="Discard" onPress={() => setVideo(undefined)} />
+  //     </SafeAreaView>
+  //   );
+  // }
 
   return (
     <View style={styles.centeredView}>
@@ -154,34 +211,24 @@ function ModalCamera({
         transparent={true}
         visible={modalCameraVisible}
       >
-        <Camera
-          style={styles.modalCamera}
-          ref={camera}
-          autoFocus={true}
-          ratio="16:9"
-          zoom={zoomValue}
-          whiteBalance={whiteBalance}
-          flashMode={flash}
-          type={cameraType}
-        >
-          <View style={styles.contentFlipFlash}>
-            <View style={styles.subContentFlipFlash}>
-              <TouchableOpacity onPress={handleToggleFlipCamera}>
-                <MaterialCommunityIcons
-                  name="camera-flip"
-                  size={24}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={handleToggleFlash}>
-                <MaterialCommunityIcons
-                  name={flash === "on" ? "flashlight" : "flashlight-off"}
-                  size={24}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+        {mode === "camera" ? (
+          <TakeCameraView
+            camera={camera}
+            zoomValue={zoomValue}
+            whiteBalance={whiteBalance}
+            flash={flash}
+            cameraType={cameraType}
+          />
+        ) : (
+          <RecordVideoView
+            camera={camera}
+            zoomValue={zoomValue}
+            whiteBalance={whiteBalance}
+            flash={flash}
+            cameraType={cameraType}
+          />
+        )}
+        <View style={styles.contentSettingCamera}>
           <View style={styles.contentZoomSlider}>
             <Slider
               onValueChange={zoomEffect}
@@ -220,20 +267,77 @@ function ModalCamera({
                   ))}
                 </ScrollView>
               </View>
-              <View style={styles.contentCameraIcon}>
-                <TouchableOpacity onPress={handleTakePhoto}>
-                  <FontAwesome name="camera" size={24} color="#FFFFFF" />
+              <View style={styles.contentCameraNavigation}>
+                <TouchableOpacity onPress={() => setMode("camera")}>
+                  <Text
+                    style={[
+                      styles.textCameraNavigation,
+                      mode === "camera" ? { color: "red" } : null,
+                    ]}
+                  >
+                    Camera
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
-                  <Entypo name="video-camera" size={24} color="#FFFFFF" />
+                <TouchableOpacity onPress={() => setMode("video")}>
+                  <Text
+                    style={[
+                      styles.textCameraNavigation,
+                      mode === "video" ? { color: "red" } : null,
+                    ]}
+                  >
+                    Video
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={closeModalCamera}>
+                <TouchableOpacity
+                  onPress={() => {
+                    closeModalCamera();
+                    camera.current = null;
+                  }}
+                  style={styles.btnClose}
+                >
                   <FontAwesome name="close" size={24} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.contentCameraIcon}>
+                <TouchableOpacity onPress={handleToggleFlipCamera}>
+                  <MaterialCommunityIcons
+                    name="camera-flip"
+                    size={24}
+                    color="#FFFFFF"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={
+                    mode === "camera"
+                      ? handleTakePhoto
+                      : isRecordingVideo
+                      ? handleStopRecording
+                      : handleRecordVideo
+                  }
+                >
+                  <Ionicons
+                    name={
+                      mode === "camera"
+                        ? "camera"
+                        : isRecordingVideo
+                        ? "videocam-off"
+                        : "videocam"
+                    }
+                    size={24}
+                    color="#FFFFFF"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleToggleFlash}>
+                  <MaterialCommunityIcons
+                    name={flash === "on" ? "flashlight" : "flashlight-off"}
+                    size={24}
+                    color="#FFFFFF"
+                  />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-        </Camera>
+        </View>
       </Modal>
     </View>
   );
@@ -243,26 +347,17 @@ const styles = StyleSheet.create({
   centeredView: {
     backgroundColor: "#FFFFFF",
   },
-  modalCamera: {
-    flex: 1,
-  },
-  contentFlipFlash: {
+  contentSettingCamera: {
     width: "100%",
+    height: "auto",
     position: "absolute",
-    top: 0,
-    backgroundColor: "#000000",
-    opacity: 0.5,
-  },
-  subContentFlipFlash: {
-    padding: 20,
+    bottom: 0,
+    paddingBottom: 50,
     display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+    flexDirection: "column",
   },
   contentZoomSlider: {
     width: "100%",
-    position: "absolute",
-    top: 550,
   },
   zoomSlider: {
     width: "100%",
@@ -270,9 +365,7 @@ const styles = StyleSheet.create({
   },
   contentCameraOption: {
     width: "100%",
-    position: "absolute",
-    bottom: 0,
-    paddingBottom: 50,
+    height: "100%",
     backgroundColor: "#000000",
     opacity: 0.5,
   },
@@ -293,11 +386,28 @@ const styles = StyleSheet.create({
   textItemCameraEffect: {
     fontSize: 14,
   },
-  contentCameraIcon: {
-    padding: 20,
+  contentCameraNavigation: {
+    position: "relative",
+    marginVertical: 15,
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+  },
+  textCameraNavigation: {
+    fontSize: 14,
+    color: "#FFFFFF",
+  },
+  btnClose: {
+    position: "absolute",
+    right: 20,
+  },
+  contentCameraIcon: {
+    paddingHorizontal: 20,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   textCameraPermission: {
     alignSelf: "center",
