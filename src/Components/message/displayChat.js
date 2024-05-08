@@ -7,11 +7,14 @@ import {
   View,
   Pressable,
   Image,
+  Modal,
+  Dimensions,
 } from "react-native";
 
 import BtnDownloadFile from "./btnDownloadFile";
 import BtnPlayAudio from "./btnPlayAudio";
 import BtnPlayVideo from "./btnPlayVideo";
+import PreviewImage from "./previewImage";
 
 function DisplayChat({
   state,
@@ -51,41 +54,28 @@ function DisplayChat({
       onLongPress={() => handleHold(item?.id)}
       onPress={() => handleClick(item?.id)}
     >
-      {item?.files?.map((file, index) => {
-        if (file?.fileType === "audio/webm") {
-          return (
-            <View key={index}>
+      {item?.files?.map((file, index) => (
+        <View key={index} style={styles.contentShowFile}>
+          {file?.extension !== null ? (
+            file.extension === ".jpg" ? (
+              <PreviewImage file={file} />
+            ) : file.extension === ".mp4" ? (
+              <BtnPlayVideo file={file} />
+            ) : (
               <BtnPlayAudio file={file} index={index} />
+            )
+          ) : (
+            <View style={styles.contentDownloadFile}>
+              <BtnDownloadFile file={file} />
+              <Text style={styles.textFile}>
+                {file?.fileName?.length > 30
+                  ? file?.fileName.slice(0, 30) + "..."
+                  : file?.fileName}
+              </Text>
             </View>
-          );
-        } else {
-          return (
-            <View key={index} style={styles.contentShowFile}>
-              {file?.type !== null ? (
-                file?.type === "image" ? (
-                  <Image
-                    style={styles.filePhoto}
-                    source={{ uri: file?.filePath }}
-                    alt={file?.fileName}
-                  />
-                ) : (
-                  <BtnPlayVideo file={file} />
-                )
-              ) : (
-                <View style={styles.contentDownloadFile}>
-                  <BtnDownloadFile file={file} />
-                  <Text style={styles.textFile}>
-                    {file?.fileName?.length > 30
-                      ? file?.fileName.slice(0, 30) + "..."
-                      : file?.fileName}
-                  </Text>
-                </View>
-              )}
-            </View>
-          );
-        }
-      })}
-
+          )}
+        </View>
+      ))}
       <View style={styles.contentMessage}>
         {item?.message !== "" && (
           <Text style={styles.textMessage}>{item?.message}</Text>
@@ -190,11 +180,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-  },
-  filePhoto: {
-    width: 250,
-    height: 250,
-    borderRadius: 5,
   },
   contentDownloadFile: {
     marginBottom: 10,

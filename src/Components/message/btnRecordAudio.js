@@ -76,6 +76,7 @@ function BtnRecordAudio({
         // fileSize: 100,
         base64: base64,
         duration: recording._finalDurationMillis,
+        extension: recording._options.android.extension,
       },
     ];
 

@@ -48,7 +48,7 @@ function Chat({
       fileType: file?.fileType || file?.mimeType,
       fileSize: file?.fileSize || file?.filesize,
       base64: file?.base64,
-      type: file?.type,
+      extension: file?.extension,
     }));
 
     const data = {

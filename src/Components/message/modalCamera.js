@@ -101,16 +101,17 @@ function ModalCamera({ form, setForm, modalCameraVisible, closeModalCamera }) {
       };
       let photo = await camera.current.takePictureAsync(result);
 
-      // catch file name
+      // get filename & extension
       const uriParts = photo.uri.split("/");
       const fileName = uriParts[uriParts.length - 1];
+      const extension = "." + fileName.split(".").pop();
 
       const dataFiles = {
         uri: photo.uri,
         fileName: fileName,
-        fileType: "image/jpeg",
+        // fileType: "image/jpeg",
         base64: photo.base64,
-        type: "image",
+        extension: extension,
         width: photo.width,
         height: photo.height,
       };
@@ -139,9 +140,10 @@ function ModalCamera({ form, setForm, modalCameraVisible, closeModalCamera }) {
 
       const video = await camera.current.recordAsync(result);
 
-      // catch file name
+      // get filename & extension
       const uriParts = video.uri.split("/");
       const fileName = uriParts[uriParts.length - 1];
+      const extension = "." + fileName.split(".").pop();
 
       const base64 = await FileSystem.readAsStringAsync(video?.uri, {
         encoding: FileSystem?.EncodingType?.Base64,
@@ -150,9 +152,9 @@ function ModalCamera({ form, setForm, modalCameraVisible, closeModalCamera }) {
       const dataFiles = {
         uri: video.uri,
         fileName: fileName,
-        fileType: "video/mp4",
+        // fileType: "video/mp4",
         base64: base64,
-        type: "video",
+        extension: extension,
       };
 
       if (video) {

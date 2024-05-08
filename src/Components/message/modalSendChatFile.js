@@ -78,8 +78,8 @@ function ModalSendChatFile({
           </TouchableOpacity>
           <ScrollView style={styles.contentFiles}>
             {form?.files?.map((file, i) => {
-              return file?.type && file?.type !== undefined ? (
-                file?.type === "image" ? (
+              return file?.extension && file?.extension !== undefined ? (
+                file?.extension === ".jpg" ? (
                   <Image
                     key={i}
                     source={{ uri: file?.uri }}
