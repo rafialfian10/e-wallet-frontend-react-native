@@ -168,11 +168,11 @@ const styles = StyleSheet.create({
   },
   btnProfile: {
     width: "100%",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   btnQrCode: {
     width: "100%",
-    marginBottom: 10,
+    marginBottom: 15,
     display: "flex",
     justifyContent: "center",
   },

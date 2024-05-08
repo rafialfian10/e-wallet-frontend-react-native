@@ -17,16 +17,16 @@ function BtnPlayVideo({ file }) {
   };
 
   useEffect(() => {
-    if(status) {
-        if (!status.isPlaying && status.didJustFinish) {
-          setProgress(0);
-        } else {
-          setProgress(status.positionMillis / status.durationMillis);
-    
-          if (status.didJustFinish) {
-            video.current.pauseAsync();
-          }
+    if (status) {
+      if (!status?.isPlaying && status?.didJustFinish) {
+        setProgress(0);
+      } else {
+        setProgress(status?.positionMillis / status?.durationMillis);
+
+        if (status?.didJustFinish) {
+          video.current.pauseAsync();
         }
+      }
     }
   }, [status]);
 
@@ -38,7 +38,7 @@ function BtnPlayVideo({ file }) {
         source={{ uri: file?.filePath || file?.uri }}
         isLooping={true}
         useNativeControls={false}
-        resizeMode={ResizeMode.STRETCH}
+        resizeMode={ResizeMode.COVER}
         onPlaybackStatusUpdate={(status) => setStatus(status)}
       />
       <TouchableOpacity
@@ -55,19 +55,21 @@ function BtnPlayVideo({ file }) {
           color="#FFFFFF"
         />
       </TouchableOpacity>
-      <View style={styles.contentDurationVideo}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progress, { width: `${progress * 100}%` }]} />
+      {status?.isPlaying ? (
+        <View style={styles.contentDurationVideo}>
+          <View style={styles.progressBar}>
+            <View style={[styles.progress, { width: `${progress * 100}%` }]} />
+          </View>
+          <Text style={styles.textDurationVideo}>
+            {status && status.isPlaying
+              ? FormattedTime(status && status.positionMillis)
+              : FormattedTime(status && status.durationMillis)}
+          </Text>
+          <TouchableOpacity onPress={handleFullscreen}>
+            <MaterialIcons name="fullscreen" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.textDurationVideo}>
-          {status && status.isPlaying
-            ? FormattedTime(status && status.positionMillis)
-            : FormattedTime(status && status.durationMillis)}
-        </Text>
-        <TouchableOpacity onPress={handleFullscreen}>
-          <MaterialIcons name="fullscreen" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+      ) : null}
     </View>
   );
 }

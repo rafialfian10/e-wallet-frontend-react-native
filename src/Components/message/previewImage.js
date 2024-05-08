@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, View, Pressable, Image, Modal, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  Image,
+  Modal,
+  Dimensions,
+} from "react-native";
 
 const { width, height } = Dimensions.get("window");
 

@@ -126,7 +126,7 @@ function ModalSendChatFile({
               value={form.message}
             />
             <View style={styles.contentIcon}>
-              {form?.files?.some((file) => file?.type !== undefined) ? (
+              {form?.files?.some((file) => file?.extension !== undefined) ? (
                 ""
               ) : (
                 <TouchableOpacity

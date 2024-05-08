@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chat";
@@ -37,7 +37,7 @@ function MessageUser({ showChat, setShowChat }) {
 
     // define corresponding socket listener
     socket.on("notification deleted", () => {
-      if(adminContact) {
+      if (adminContact) {
         socket.emit("load messages", adminContact?.id);
       }
     });
@@ -159,15 +159,15 @@ function MessageUser({ showChat, setShowChat }) {
   }, [messages]);
 
   const handleRefresh = () => {
-    socket.emit("load messages", adminContact?.id)
+    socket.emit("load messages", adminContact?.id);
     loadAdminsContact();
   };
 
   return !showChat ? (
-    <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
-      <View style={styles.subContainerMessage}>
-        <Text style={styles.textLogo}>E-Wallet</Text>
-        <View style={styles.contactContainer}>
+    <View>
+      <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
+        <View style={styles.subContainerMessage}>
+          <Text style={styles.textLogo}>E-Wallet</Text>
           <DisplayMessage
             adminsContact={adminsContact}
             messages={messages}
@@ -177,18 +177,18 @@ function MessageUser({ showChat, setShowChat }) {
             setShowChat={setShowChat}
           />
         </View>
-      </View>
-    </RefreshPage>
+      </RefreshPage>
+    </View>
   ) : (
-      <Chat
-        state={state}
-        adminsOnline={adminsOnline}
-        adminContact={adminContact}
-        messages={messages}
-        setMessages={setMessages}
-        setShowChat={setShowChat}
-        handleRefresh={handleRefresh}
-      />
+    <Chat
+      state={state}
+      adminsOnline={adminsOnline}
+      adminContact={adminContact}
+      messages={messages}
+      setMessages={setMessages}
+      setShowChat={setShowChat}
+      handleRefresh={handleRefresh}
+    />
   );
 }
 

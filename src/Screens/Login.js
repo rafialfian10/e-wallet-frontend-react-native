@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   },
   errorLogin: {
     width: "100%",
-    paddingHorizontal: 10,
+    paddingHorizontal: 13,
     alignSelf: "center",
     fontSize: 11,
     color: "red",

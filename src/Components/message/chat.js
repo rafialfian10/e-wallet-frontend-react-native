@@ -82,6 +82,7 @@ function Chat({
             messages={messages}
             holdIndexes={holdIndexes}
             setHoldIndexes={setHoldIndexes}
+            setShowChat={setShowChat}
           />
         </RefreshPage>
         <BtnSendChat
