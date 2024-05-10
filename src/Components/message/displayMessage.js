@@ -1,62 +1,69 @@
 import { useState, useEffect } from "react";
+import { AntDesign } from "@expo/vector-icons";
 import moment from "moment";
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native";
 
-import { PATH_FILE } from "@env";
-
 function DisplayMessage({
-  adminsContact,
-  usersContact,
+  state,
+  form,
+  setForm,
+  contacts,
   messages,
-  notifications,
-  setNotifications,
+  checklist,
+  setChecklist,
   setShowChat,
   onClickContact,
 }) {
   const [allNotification, setAllNotification] = useState([]);
 
-  const handleShowChat = (id) => {
-    setShowChat(true);
+  const handleShowChat = (dataContact) => {
+    if (form?.files?.length > 0) {
+      setChecklist((prevChecklist) => ({
+        check:
+          !prevChecklist.check ||
+          prevChecklist.activeContactId !== dataContact?.id,
+        activeContactId:
+          prevChecklist.activeContactId !== dataContact?.id
+            ? dataContact?.id
+            : null,
+      }));
+
+      setForm((prevForm) => ({
+        ...prevForm,
+        contacts: prevForm.contacts !== dataContact ? dataContact : null,
+      }));
+    } else {
+      setShowChat(true);
+    }
   };
 
-  // notification from admin for users
+  // notification from admin and users
   useEffect(() => {
     const dataNotifications = [];
 
-    adminsContact?.forEach((adminContact) => {
-      adminContact?.senderMessage?.forEach((message) => {
-        dataNotifications.push({
-          id: message?.id,
-          notification: message?.notification,
-        });
+    contacts?.forEach((contact) => {
+      contact?.senderMessage?.forEach((message) => {
+          dataNotifications.push({
+            id: message?.id,
+            notification: message?.notification,
+            recipientId: message?.recipientId,
+          });
       });
     });
 
     setAllNotification(dataNotifications);
-  }, [adminsContact, messages]);
-
-  // notification from users for admin
-  useEffect(() => {
-    const dataNotifications = [];
-
-    usersContact?.forEach((userContact) => {
-      userContact?.senderMessage?.forEach((message) => {
-        dataNotifications.push({
-          id: message?.id,
-          notification: message?.notification,
-        });
-      });
-    });
-
-    setAllNotification(dataNotifications);
-  }, [usersContact, messages]);
+  }, [contacts, messages]);
 
   return (
     <View style={styles.contentMessage}>
-      {(usersContact?.length > 0 || usersContact !== undefined) &&
-        usersContact?.map((userContact, i) => {
-          const notificationCount = allNotification?.filter(
-            (notification) => notification?.notification === userContact?.id
+      {(contacts?.length > 0 || contacts !== undefined) &&
+        contacts?.map((contact, i) => {
+          const notificationCountAdmin = allNotification?.filter(
+            (notification) => notification?.notification === contact?.id
+          ).length;
+
+          const notificationCountUser = allNotification?.filter(
+            (notification) => notification?.notification === contact?.id && notification?.recipientId === state?.user?.id
           ).length;
 
           return (
@@ -64,89 +71,46 @@ function DisplayMessage({
               key={i}
               style={styles.contactContainer}
               onPress={() => {
-                handleShowChat(userContact?.id);
-                onClickContact(userContact);
+                handleShowChat(contact);
+                onClickContact(contact);
               }}
             >
               <View style={styles.contentPhoto}>
-                {userContact?.photo &&
-                userContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
-                  <Image
-                    source={{ uri: userContact?.photo }}
-                    style={styles.photo}
-                    alt="photo"
-                  />
-                ) : (
-                  <Image
-                    source={require("../../../assets/default-photo.png")}
-                    style={styles.photo}
-                    alt="default-photo"
-                  />
-                )}
-              </View>
-              <View style={styles.contentDataUser}>
-                <View style={styles.contentUsernameDate}>
-                  <Text style={styles.username}>{userContact?.username}</Text>
-                  <Text style={styles.date}>
-                    {userContact.createdAt
-                      ? moment(userContact?.createdAt).format("DD/MM/YY")
-                      : ""}
-                  </Text>
-                </View>
-                <View style={styles.contentMessageNotification}>
-                  <Text style={styles.message}>{userContact?.message}</Text>
-                  {notificationCount > 0 && (
-                    <Text style={styles.notification}>{notificationCount}</Text>
+                <Image
+                  source={
+                    contact?.photo
+                      ? { uri: contact.photo }
+                      : require("../../../assets/default-photo.png")
+                  }
+                  style={styles.photo}
+                  alt={contact?.photo ? "photo" : "default-photo"}
+                />
+                {checklist?.check &&
+                  contact?.id === checklist?.activeContactId && (
+                    <AntDesign
+                      name="checkcircle"
+                      size={20}
+                      color="#38B03E"
+                      style={styles.checklistIcon}
+                    />
                   )}
-                </View>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      {(adminsContact?.length > 0 || adminsContact !== undefined) &&
-        adminsContact?.map((adminContact, i) => {
-          const notificationCount = allNotification?.filter(
-            (notification) => notification?.notification === adminContact?.id
-          ).length;
-
-          return (
-            <TouchableOpacity
-              key={i}
-              style={styles.contactContainer}
-              onPress={() => {
-                handleShowChat(adminContact?.id);
-                onClickContact(adminContact);
-              }}
-            >
-              <View style={styles.contentPhoto}>
-                {adminContact?.photo &&
-                adminContact?.photo !== `${PATH_FILE}/static/photo/null` ? (
-                  <Image
-                    source={{ uri: adminContact?.photo }}
-                    style={styles.photo}
-                    alt="photo"
-                  />
-                ) : (
-                  <Image
-                    source={require("../../../assets/default-photo.png")}
-                    style={styles.photo}
-                    alt="default-photo"
-                  />
-                )}
               </View>
               <View style={styles.contentDataUser}>
                 <View style={styles.contentUsernameDate}>
-                  <Text style={styles.username}>{adminContact?.username}</Text>
+                  <Text style={styles.username}>{contact?.username}</Text>
                   <Text style={styles.date}>
-                    {adminContact.createdAt
-                      ? moment(adminContact?.createdAt).format("DD/MM/YY")
+                    {contact.createdAt
+                      ? moment(contact?.createdAt).format("DD/MM/YY")
                       : ""}
                   </Text>
                 </View>
                 <View style={styles.contentMessageNotification}>
-                  <Text style={styles.message}>{adminContact?.message}</Text>
-                  {notificationCount > 0 && (
-                    <Text style={styles.notification}>{notificationCount}</Text>
+                  <Text style={styles.message}>{contact?.message}</Text>
+                  {notificationCountAdmin > 0 && state?.user?.role?.id === 2 && (
+                    <Text style={styles.notification}>{notificationCountAdmin}</Text>
+                  )}
+                   {notificationCountUser > 0 && state?.user?.role?.id === 3 && (
+                    <Text style={styles.notification}>{notificationCountUser}</Text>
                   )}
                 </View>
               </View>
@@ -170,6 +134,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   contentPhoto: {
+    position: "relative",
     width: "15%",
     marginHorizontal: 5,
   },
@@ -177,6 +142,11 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 50,
+  },
+  checklistIcon: {
+    position: "absolute",
+    bottom: -2,
+    right: -2,
   },
   contentDataUser: {
     width: "85%",

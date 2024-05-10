@@ -9,6 +9,8 @@ import RefreshPage from "../refreshPage";
 
 function Chat({
   state,
+  form,
+  setForm,
   usersOnline,
   userContact,
   adminsOnline,
@@ -18,28 +20,25 @@ function Chat({
   setShowChat,
   handleRefresh,
 }) {
-  const [form, setForm] = useState({
-    message: "",
-    files: [],
-  });
   const [holdIndexes, setHoldIndexes] = useState([]);
   const [modalChatFile, setModalChatFile] = useState(false);
 
   const closeModalChatFile = () => {
     setModalChatFile(false);
     setForm({
+      contacts: null,
       message: "",
       files: [],
     });
   };
 
   useEffect(() => {
-    if (form.files.length > 0) {
+    if (form?.files?.length > 0) {
       setModalChatFile(true);
     } else {
       setModalChatFile(false);
     }
-  }, [form.files]);
+  }, [form?.files]);
 
   const onSendMessage = (form) => {
     const dataFiles = form?.files?.map((file) => ({
@@ -77,6 +76,8 @@ function Chat({
         <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
           <DisplayChat
             state={state}
+            form={form}
+            setForm={setForm}
             userContact={userContact}
             adminContact={adminContact}
             messages={messages}
@@ -93,7 +94,7 @@ function Chat({
           onSendMessage={onSendMessage}
         />
       </View>
-      {form.files.length !== 0 && (
+      {form?.files?.length > 0 && (
         <ModalSendChatFile
           form={form}
           setForm={setForm}

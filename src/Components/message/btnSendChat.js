@@ -52,9 +52,10 @@ function BtnSendChat({
   };
 
   const handleSendMessage = () => {
-    if (form.message !== "" || form.files.length !== 0) {
+    if (form?.message !== "" || form?.files?.length !== 0) {
       onSendMessage(form);
       setForm({
+        contacts: null,
         message: "",
         files: [],
       });
@@ -71,7 +72,7 @@ function BtnSendChat({
         placeholderTextColor={isRecording ? "#F55676" : "#808080"}
         multiline={true}
         onChangeText={(value) => handleChange("message", value)}
-        value={form.message}
+        value={form?.message}
       />
       {isRecording ? (
         <View style={styles.contentMicrophone}>
@@ -93,8 +94,8 @@ function BtnSendChat({
           <Pressable onPress={() => HandleOpenDocument({ form, setForm })}>
             <MaterialIcons name="attach-file" size={22} color="#808080" />
           </Pressable>
-          {form.message !== "" ? (
-            <View></View>
+          {form?.message !== "" ? (
+            null
           ) : (
             <Pressable
               style={styles.iconCamera}
@@ -106,7 +107,7 @@ function BtnSendChat({
           )}
         </View>
       )}
-      {form.message !== "" ? (
+      {form?.message !== "" ? (
         <Pressable onPress={handleSendMessage} style={styles.btnSend}>
           <Ionicons name="send" size={22} color="#FFFFFF" />
         </Pressable>

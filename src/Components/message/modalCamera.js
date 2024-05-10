@@ -152,7 +152,6 @@ function ModalCamera({ form, setForm, modalCameraVisible, closeModalCamera }) {
       const dataFiles = {
         uri: video.uri,
         fileName: fileName,
-        // fileType: "video/mp4",
         base64: base64,
         extension: extension,
       };

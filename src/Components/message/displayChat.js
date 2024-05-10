@@ -12,11 +12,13 @@ import {
 import BtnDownloadFile from "./btnDownloadFile";
 import BtnPlayAudio from "./btnPlayAudio";
 import BtnPlayVideo from "./btnPlayVideo";
-import BtnContinueSendChat from "./btnContinueSendChat";
+import BtnContinueChat from "./btnContinueChat";
 import PreviewImage from "./previewImage";
 
 function DisplayChat({
   state,
+  form,
+  setForm,
   userContact,
   adminContact,
   messages,
@@ -59,7 +61,12 @@ function DisplayChat({
           ]}
         >
           {file?.extension === ".jpg" || file?.extension === ".mp4" ? (
-            <BtnContinueSendChat file={file} setShowChat={setShowChat} />
+            <BtnContinueChat
+              file={file}
+              form={form}
+              setForm={setForm}
+              setShowChat={setShowChat}
+            />
           ) : null}
           <View
             style={[
@@ -146,7 +153,7 @@ function DisplayChat({
         </View>
       ))}
       {item?.files[0]?.extension !== ".m4a" ? (
-        <View
+        <Pressable
           style={[
             styles.contentMessage,
             {
@@ -157,6 +164,8 @@ function DisplayChat({
               opacity: holdIndexes.includes(item?.id) ? 0.5 : 1,
             },
           ]}
+          onLongPress={() => handleHold(item?.id)}
+          onPress={() => handleClick(item?.id)}
         >
           {item?.message !== "" && (
             <Text style={styles.textMessage}>{item?.message}</Text>
@@ -180,7 +189,7 @@ function DisplayChat({
               />
             ) : null}
           </View>
-        </View>
+        </Pressable>
       ) : null}
     </View>
   );
@@ -287,14 +296,15 @@ const styles = StyleSheet.create({
     color: "#000000",
   },
   contentMessage: {
-    padding: 5,
+    maxWidth: "80%",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     borderRadius: 10,
   },
   textMessage: {
-    width: "100%",
     textAlign: "left",
     textAlignVertical: "center",
     fontSize: 14,

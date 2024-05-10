@@ -5,6 +5,7 @@ import { StyleSheet, View, Text } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chat";
+import BtnContinueSendChat from "./btnContinueSendChat";
 import RefreshPage from "../refreshPage";
 import { SOCKET_SERVER } from "@env";
 import { UserContext } from "../../Context/UserContext";
@@ -17,6 +18,15 @@ function MessageUser({ showChat, setShowChat }) {
   const [adminContact, setAdminContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [form, setForm] = useState({
+    contacts: null,
+    message: "",
+    files: [],
+  });
+  const [checklist, setChecklist] = useState({
+    check: false,
+    activeContactId: null,
+  });
 
   useEffect(() => {
     socket = io(SOCKET_SERVER, {
@@ -65,33 +75,36 @@ function MessageUser({ showChat, setShowChat }) {
     socket.emit("load admins contact");
 
     socket.on("admins contact", (data) => {
-      // filter just customers which have sent a message
-      let dataAdminsContact = data?.filter(
-        (item) =>
-          item?.recipientMessage.length >= 0 || item?.senderMessage.length >= 0
-      );
-
-      // manipulate customers to add message property with the newest message
-      dataAdminsContact = dataAdminsContact?.map((item) => {
-        const allMessages = [...item.senderMessage, ...item.recipientMessage];
-
-        // sort by createAt
-        allMessages.sort(
-          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      let dataAdminsContact = data.map((item) => {
+        // filter
+        const senderMessages = item.senderMessage.filter(
+          (msg) =>
+            msg.recipientId === state?.user?.id ||
+            msg.senderId === state?.user?.id
         );
+        const recipientMessages = item.recipientMessage.filter(
+          (msg) =>
+            msg.recipientId === state?.user?.id ||
+            msg.senderId === state?.user?.id
+        );
+
+        const messages = [...senderMessages, ...recipientMessages];
+        const sortedMessages = messages.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        const latestMessage =
+          sortedMessages.length > 0 ? sortedMessages[0] : null;
 
         return {
           ...item,
-          message:
-            allMessages.length > 0
-              ? allMessages[allMessages.length - 1].message
-              : "Click here to start message",
-          createdAt:
-            allMessages.length > 0
-              ? allMessages[allMessages.length - 1].createdAt
-              : "",
+          message: latestMessage
+            ? latestMessage.message
+            : "Click here to start message",
+          createdAt: latestMessage ? latestMessage.createdAt : "",
         };
       });
+
       setAdminsContact(dataAdminsContact);
     });
   };
@@ -164,24 +177,36 @@ function MessageUser({ showChat, setShowChat }) {
   };
 
   return !showChat ? (
-    <View>
+    <View style={styles.subContainerMessage}>
       <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
-        <View style={styles.subContainerMessage}>
+        <View>
           <Text style={styles.textLogo}>E-Wallet</Text>
           <DisplayMessage
-            adminsContact={adminsContact}
+            state={state}
+            form={form}
+            setForm={setForm}
+            contacts={adminsContact}
             messages={messages}
-            notifications={notifications}
-            setNotifications={setNotifications}
+            checklist={checklist}
+            setChecklist={setChecklist}
             onClickContact={onClickAdminContact}
             setShowChat={setShowChat}
           />
         </View>
       </RefreshPage>
+      {form?.files?.length > 0 ? (
+        <BtnContinueSendChat
+          form={form}
+          setForm={setForm}
+          setChecklist={setChecklist}
+        />
+      ) : null}
     </View>
   ) : (
     <Chat
       state={state}
+      form={form}
+      setForm={setForm}
       adminsOnline={adminsOnline}
       adminContact={adminContact}
       messages={messages}
@@ -194,6 +219,7 @@ function MessageUser({ showChat, setShowChat }) {
 
 const styles = StyleSheet.create({
   subContainerMessage: {
+    flex: 1,
     width: "100%",
   },
   textLogo: {

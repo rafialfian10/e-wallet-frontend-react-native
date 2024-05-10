@@ -1,10 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { io } from "socket.io-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import DisplayMessage from "./displayMessage";
 import Chat from "./chat";
+import BtnContinueSendChat from "./btnContinueSendChat";
 import RefreshPage from "../refreshPage";
 import { SOCKET_SERVER } from "@env";
 import { UserContext } from "../../Context/UserContext";
@@ -17,6 +18,15 @@ function MessageAdmin({ showChat, setShowChat }) {
   const [userContact, setUserContact] = useState(null);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [form, setForm] = useState({
+    contacts: null,
+    message: "",
+    files: [],
+  });
+  const [checklist, setChecklist] = useState({
+    check: false,
+    activeContactId: null,
+  });
 
   useEffect(() => {
     socket = io(SOCKET_SERVER, {
@@ -163,24 +173,36 @@ function MessageAdmin({ showChat, setShowChat }) {
   };
 
   return !showChat ? (
-    <View style={{flex: 1}}>
+    <View style={styles.subContainerMessage}>
       <RefreshPage pageStyle={""} onRefresh={handleRefresh}>
-        <View style={styles.subContainerMessage}>
+        <View>
           <Text style={styles.textLogo}>E-Wallet</Text>
           <DisplayMessage
-            usersContact={usersContact}
+            state={state}
+            form={form}
+            setForm={setForm}
+            contacts={usersContact}
             messages={messages}
-            notifications={notifications}
-            setNotifications={setNotifications}
+            checklist={checklist}
+            setChecklist={setChecklist}
             onClickContact={onClickUserContact}
             setShowChat={setShowChat}
           />
         </View>
       </RefreshPage>
+      {form?.files?.length > 0 ? (
+        <BtnContinueSendChat
+          form={form}
+          setForm={setForm}
+          setChecklist={setChecklist}
+        />
+      ) : null}
     </View>
   ) : (
     <Chat
       state={state}
+      form={form}
+      setForm={setForm}
       usersOnline={usersOnline}
       userContact={userContact}
       messages={messages}
@@ -193,6 +215,7 @@ function MessageAdmin({ showChat, setShowChat }) {
 
 const styles = StyleSheet.create({
   subContainerMessage: {
+    flex: 1,
     width: "100%",
   },
   textLogo: {

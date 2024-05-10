@@ -41,14 +41,15 @@ function ModalSendChatFile({
   };
 
   const deleteFile = (index) => {
-    const updatedFiles = form.files.filter((file, i) => i !== index);
+    const updatedFiles = form?.files.filter((file, i) => i !== index);
     handleChange("files", updatedFiles);
   };
 
   const handleSendFileMessage = () => {
-    if (form.message !== "" || form.files.length !== 0) {
+    if (form?.message !== "" || form?.files?.length !== 0) {
       onSendMessage(form);
       setForm({
+        contacts: null,
         message: "",
         files: [],
       });
@@ -63,7 +64,7 @@ function ModalSendChatFile({
             styles.modalViewChatFile,
             {
               backgroundColor: form?.files?.some(
-                (file) => file?.type !== undefined
+                (file) => file?.extension !== undefined
               )
                 ? "#000000"
                 : "#FFFFFF",
@@ -101,7 +102,7 @@ function ModalSendChatFile({
                 <View key={i} style={styles.files}>
                   <AntDesign name="file1" size={30} color="black" />
                   <Text style={styles.filename}>
-                    {file?.fileName.length > 30
+                    {file?.fileName?.length > 30
                       ? file?.fileName.substring(0, 30) + "..."
                       : file?.fileName}
                   </Text>
@@ -123,7 +124,7 @@ function ModalSendChatFile({
               multiline={true}
               style={styles.inputChat}
               onChangeText={(value) => handleChange("message", value)}
-              value={form.message}
+              value={form?.message}
             />
             <View style={styles.contentIcon}>
               {form?.files?.some((file) => file?.extension !== undefined) ? (
