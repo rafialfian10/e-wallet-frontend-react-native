@@ -75,26 +75,16 @@ function MessageUser({ showChat, setShowChat }) {
     socket.emit("load admins contact");
 
     socket.on("admins contact", (data) => {
-      let dataAdminsContact = data.map((item) => {
-        // filter
-        const senderMessages = item.senderMessage.filter(
-          (msg) =>
-            msg.recipientId === state?.user?.id ||
-            msg.senderId === state?.user?.id
-        );
-        const recipientMessages = item.recipientMessage.filter(
-          (msg) =>
-            msg.recipientId === state?.user?.id ||
-            msg.senderId === state?.user?.id
-        );
+      const dataAdminsContact = data.map((item) => {
+        const messages = [...item.senderMessage, ...item.recipientMessage]
+          .filter(
+            (msg) =>
+              msg.recipientId === state?.user?.id ||
+              msg.senderId === state?.user?.id
+          )
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        const messages = [...senderMessages, ...recipientMessages];
-        const sortedMessages = messages.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-
-        const latestMessage =
-          sortedMessages.length > 0 ? sortedMessages[0] : null;
+        const latestMessage = messages.length > 0 ? messages[0] : null;
 
         return {
           ...item,
