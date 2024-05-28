@@ -25,7 +25,8 @@ function BtnRecordAudio({
   const btnHeightAnim = useRef(new Animated.Value(50)).current;
   const pan = useRef(new Animated.ValueXY()).current;
 
-  // console.log("recording 1", isLongPress);
+  // console.log("is long press", isLongPress);
+  console.log("hold and drag", holdAndDrag);
 
   async function startRecording() {
     try {
@@ -144,10 +145,7 @@ function BtnRecordAudio({
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponderCapture: () => true,
-      // onMoveShouldSetPanResponderCapture: (_, gestureState) =>
-      //   isLongPress && gestureState.dx !== 0,
       onPanResponderMove: (_, gestureState) => {
-        console.log(isLongPress);
         const { dx, dy } = gestureState;
         if (dx < 0 && Math.abs(dx) <= 150 && Math.abs(dy) < 50) {
           pan.setValue({ x: dx, y: 0 }); // Mulai animasi ketika tombol digeser ke kiri
@@ -179,11 +177,9 @@ function BtnRecordAudio({
           }
           // }
 
-          console.log("recording 2", recording);
-
-          setRecording(undefined);
-          setIsRecording(false);
-          clearTimeout(holdTimeout.current);
+          // setRecording(undefined);
+          // setIsRecording(false);
+          // clearTimeout(holdTimeout.current);
 
           Animated.parallel([
             Animated.timing(btnWidthAnim, {
@@ -198,7 +194,7 @@ function BtnRecordAudio({
             }),
           ]).start();
         } else {
-          console.log("record start");
+          console.log("record still hold and drag");
         }
       },
     })

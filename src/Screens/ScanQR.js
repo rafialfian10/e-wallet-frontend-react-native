@@ -1,17 +1,14 @@
 import { useState, useEffect, useRef, useReducer } from "react";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Camera, CameraView } from "expo-camera/next";
-import { FlashMode } from "expo-camera";
+
 import Slider from "@react-native-community/slider";
 import {
   StyleSheet,
   SafeAreaView,
-  ScrollView,
   View,
-  StatusBar,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
   Alert,
 } from "react-native";
@@ -146,7 +143,6 @@ export default function ScanQR({ navigation }) {
     </SafeAreaView>
   ) : (
     <SafeAreaView style={styles.containerScanQr}>
-      <StatusBar />
       <View style={styles.contentCamera}>
         <Image
           source={require("../../assets/scan-code.png")}
@@ -165,31 +161,33 @@ export default function ScanQR({ navigation }) {
             interval: 10,
           }}
         />
+      </View>
+      <View style={styles.contentConfiguration}>
         <Text style={styles.textQrCode}>put the QR code in the frame</Text>
-      </View>
-      <View style={styles.contentZoomSlider}>
-        <Slider
-          onValueChange={zoomEffect}
-          style={styles.zoomSlider}
-          minimumValue={0}
-          maximumValue={1}
-          minimumTrackTintColor="#FFFFFF"
-          maximumTrackTintColor="#808080"
-        />
-      </View>
-      <View style={styles.contentCameraOption}>
-        <View style={styles.cameraOption}>
-          <View style={styles.contentCameraIcon}>
-            <TouchableOpacity onPress={handleToggleFlash}>
-              <MaterialCommunityIcons
-                name={flash === "on" ? "flashlight" : "flashlight-off"}
-                size={24}
-                color="#FFFFFF"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-              <FontAwesome name="close" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
+        <View style={styles.contentZoomSlider}>
+          <Slider
+            onValueChange={zoomEffect}
+            style={styles.zoomSlider}
+            minimumValue={0}
+            maximumValue={1}
+            minimumTrackTintColor="#FFFFFF"
+            maximumTrackTintColor="#808080"
+          />
+        </View>
+        <View style={styles.contentCameraOption}>
+          <View style={styles.cameraOption}>
+            <View style={styles.contentCameraIcon}>
+              <TouchableOpacity onPress={handleToggleFlash}>
+                <MaterialCommunityIcons
+                  name={flash === "on" ? "flashlight" : "flashlight-off"}
+                  size={24}
+                  color="#FFFFFF"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+                <FontAwesome name="close" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -219,17 +217,20 @@ const styles = StyleSheet.create({
     top: 120,
     alignSelf: "center",
   },
+  contentConfiguration: {
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+  },
   textQrCode: {
     width: "100%",
-    marginTop: 450,
+    paddingBottom: 110,
     textAlign: "center",
     fontSize: 14,
     color: "#FFFFFF",
   },
   contentZoomSlider: {
     width: "100%",
-    position: "absolute",
-    top: 500,
   },
   zoomSlider: {
     width: "100%",
@@ -237,8 +238,6 @@ const styles = StyleSheet.create({
   },
   contentCameraOption: {
     width: "100%",
-    position: "absolute",
-    bottom: 0,
     paddingBottom: 50,
     backgroundColor: "#000000",
     opacity: 0.5,
